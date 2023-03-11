@@ -38,3 +38,24 @@ class ParseTestCase(TestCase):
         poly.parsePoly(poly='2x + 1')
         ans = poly.callPoly(np.asarray(a=[[1, 2], [3, 4]]))
         self.assertTrue(np.array_equal(ans, np.asarray(a=[[3, 5], [7, 9]])))
+
+    # tests parse poly with negative
+    def testParsePolyMinus(self):
+        poly = ParseTree()
+        poly.parsePoly(poly='-4x + 1')
+        ans = poly.callPoly(2)
+        self.assertEqual(ans, -7)
+
+    # test parse poly with more complex negatives
+    def testParsePolyAdvanceMinus(self):
+        poly = ParseTree()
+        poly.parsePoly(poly='5 + -x')
+        ans = poly.callPoly(3)
+        self.assertEqual(ans, 2)
+
+    # test poly with negative parenthesis
+    def testParsePolyNegParen(self):
+        poly = ParseTree()
+        poly.parsePoly(poly='-(x + 1)')
+        ans = poly.callPoly(3)
+        self.assertEqual(ans, -4)

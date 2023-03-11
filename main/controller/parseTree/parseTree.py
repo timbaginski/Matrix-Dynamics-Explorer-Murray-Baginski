@@ -16,13 +16,20 @@ class ParseTree():
         poly = poly.replace(" ", "")
 
         # add implicit multiplication signs
+        # turn negative x into -1 * x
         # We iterate through second to last index because last index can't be being multiplied
         newPoly = ""
         for i in range(len(poly) - 1):
             if poly[i].isdigit() and (poly[i+1] == 'x' or poly[i+1] == '('):
                 newPoly += poly[i] + '*'
             elif poly[i] == ')' and (poly[i+1] == 'x' or poly[i+1].isdigit() or poly[i+1] == '.'):
-                newPoly += poly[i] + '*' 
+                newPoly += poly[i] + '*'
+            elif i > 0 and poly[i] == '-' and poly[i-1] == '+':
+                newPoly = newPoly[:len(newPoly)-1] + '-'
+            elif i > 0 and poly[i] == '-' and poly[i-1] == '-':
+                newPoly = newPoly[:len(newPoly)-1] + '+'
+            elif poly[i] == '-' and (i == 0 or (not poly[i-1].isdigit())) and (poly[i+1] == 'x' or poly[i+1] == '('):
+                newPoly += '-1*'
             else:
                 newPoly += poly[i]
         
@@ -66,6 +73,10 @@ class ParseTree():
         signs = ['+', '-', '*', '^']
         
         for index, c in enumerate(poly):
+            if index == 0 and c == '-':
+                continue
+            if index > 0 and c in operators and poly[index-1] in operators:
+                continue
             if c in signs and parens <= 0:
                 operators[c] = index
 
@@ -114,10 +125,10 @@ class ParseTree():
         # next, check if this poly is a number. If so, we return a ConstantNode
         polyStr = ''.join(poly)
 
-        if polyStr.isdigit():
+        if len(polyStr) > 0 and (polyStr.isdigit() or (polyStr[0] == '-' and polyStr[1:].isdigit())):
             return ConstantNode(val=int(polyStr))
 
-        if polyStr.replace(".", "").isnumeric():
+        if len(polyStr) > 0 and (polyStr.replace(".", "").isnumeric() or (polyStr[0] == '-' and polyStr[1:].replace(".", "").isnumeric())):
             return ConstantNode(val=float(polyStr))
     
         # now, check if the poly is a variable. If so, we return a VariableNode
