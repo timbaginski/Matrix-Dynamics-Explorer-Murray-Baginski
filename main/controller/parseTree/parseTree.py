@@ -4,6 +4,8 @@ from .multiplicationNode import MultiplicationNode
 from .exponentNode import ExponentNode
 from .constantNode import ConstantNode
 from .variableNode import VariableNode
+from .divisionNode import DivisionNode
+
 
 class ParseTree():
 
@@ -70,7 +72,7 @@ class ParseTree():
     def findLowestOp(self, poly):
         parens = 0
         operators = dict()
-        signs = ['+', '-', '*', '^']
+        signs = ['+', '-', '*', '/', '^']
         
         for index, c in enumerate(poly):
             if index == 0 and c == '-':
@@ -95,8 +97,14 @@ class ParseTree():
         if '-' in operators:
             return operators['-']
         
+        if '*' in operators and '/' in operators:
+            return operators['*'] if operators['*'] >= operators['/'] else operators['/']
+        
         if '*' in operators:
             return operators['*']
+        
+        if '/' in operators:
+            return operators['/']
         
         if '^' in operators:
             return operators['^']
@@ -116,6 +124,9 @@ class ParseTree():
         
         if op == '^':
             return ExponentNode()
+        
+        if op == '/':
+            return DivisionNode()
  
     # recursively builds the parse tree from a polynomial represented as list of characters
     def createTree(self, poly: list[str]):

@@ -59,3 +59,17 @@ class ParseTestCase(TestCase):
         poly.parsePoly(poly='-(x + 1)')
         ans = poly.callPoly(3)
         self.assertEqual(ans, -4)
+
+    # test poly with division
+    def testParsePolyDivision(self):
+        poly = ParseTree()
+        poly.parsePoly(poly='x / 3')
+        ans = poly.callPoly(3)
+        self.assertEqual(ans, 1)
+
+    # test poly with multiplication and division
+    def testParsePolyMultDiv(self):
+        poly = ParseTree()
+        poly.parsePoly(poly='x / 3 * 2')
+        ans = poly.callPoly(6)
+        self.assertEqual(ans, 4)
