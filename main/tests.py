@@ -1,9 +1,11 @@
-from django.test import TestCase
+from django.test import TestCase, Client
 from .controller.parseTree.parseTree import ParseTree
 import numpy as np
 from .controller.parseTree.maxIteration import maxIteration
 from .controller.parseTree.readMatrices import readFile
 from .controller.parseTree.outputCsv import toCsv
+import json
+
 
 class ParseTestCase(TestCase):
 
@@ -171,6 +173,76 @@ class ParseTestCase(TestCase):
             allMatrices = iteration.allIterations(polynomial="2x", maxVal = 28, startVal = matrix)
             values.append(allMatrices)
         toCsv(values, "bigOutputTest.csv")
+
+class ViewsTestCase(TestCase):
+
+    # test whether Views can return the index page
+    def testGetIndex(self):
+        c = Client()
+        response = c.get('')
+        self.assertEqual(response.status_code, 200)
+
+    # test whether Views can successfully validate a correctly formatted polynomial
+    def testValidatePoly(self):
+        c = Client()
+        response = c.get('/verifyPoly/?polynomial=x%20%2B%203')
+        content = response.content.decode('utf-8')
+        content = json.loads(content)
+        self.assertEqual(content['message'], 'Valid')
+
+    # test whether Views can successfully identify an empty poly
+    def testEmptyPoly(self):
+        c = Client()
+        response = c.get('/verifyPoly/?polynomial=')
+        content = response.content.decode('utf-8')
+        content = json.loads(content)
+        self.assertEqual(content['message'], 'Polynomial Cannot be Empty')
+
+    # test whether Views can successfully spot a poly with an invalid token
+    def testInvalidToken(self):
+        c = Client()
+        response = c.get('/verifyPoly/?polynomial=y%20%2B%203')
+        content = response.content.decode('utf-8')
+        content = json.loads(content)
+        self.assertEqual(content['message'], 'Invalid Token Error')
+
+    # test whether Views can successfully spot an invalid operation 
+    def testInvalidOperation(self):
+        c = Client()
+        response = c.get('/verifyPoly/?polynomial=x%20%2B%20^%203')
+        content = response.content.decode('utf-8')
+        content = json.loads(content)
+        self.assertEqual(content['message'], 'Invalid Operation Error')
+
+    # test whether views can insert a Poly into the db and return loading page
+    def testInsertPoly(self):
+        c = Client()
+        response = c.get('/numberPoly/?polynomial=x%20%2B%203&num=1&maxIter=100&threshold=0.1')
+        self.assertEqual(response.status_code, 200)
+
+    # test whether we can start an iteration for an inserted polynomial
+    def testStartIteration(self):
+        # insert a poly
+        c = Client()
+        response = c.get('/numberPoly/?polynomial=x%20%2B%203&num=1&maxIter=100&threshold=0.1')
+
+        # get id from response
+        response_str = response.content.decode()
+        response_id_index = response_str.index('let id = ')
+        id_str = ""
+        reached_quote = False 
+        while response_id_index < len(response_str):
+            if reached_quote and response_str[response_id_index] == '"':
+                break
+            elif response_str[response_id_index] == '"':
+                reached_quote = True
+            elif reached_quote:
+                id_str += response_str[response_id_index]
+
+            response_id_index += 1
+
+        #response = c.post('/startIteration/', json.dumps({'id': id_str}), content_type='application/json')
+        #self.assertEqual(response.status_code, 202)
 
 
 
