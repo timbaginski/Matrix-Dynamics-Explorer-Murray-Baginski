@@ -21,7 +21,7 @@ class maxIteration():
     
     # Based on results checks to see if threshold is reached
     def diverges(self, results, threshold):
-        print(results[len(results)-1] - results[len(results)-2])
+        # print(results[len(results)-1] - results[len(results)-2])
         return (results[len(results)-1] - results[len(results)-2]) > threshold
     
     def showIteration(current, end):

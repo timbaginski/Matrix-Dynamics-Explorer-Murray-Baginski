@@ -3,6 +3,7 @@ from .controller.parseTree.parseTree import ParseTree
 import numpy as np
 from .controller.parseTree.maxIteration import maxIteration
 from .controller.parseTree.readMatrices import readFile
+from .controller.parseTree.outputCsv import toCsv
 
 class ParseTestCase(TestCase):
 
@@ -155,6 +156,23 @@ class ParseTestCase(TestCase):
         matrices = iteration.allIterations(polynomial="x^2", maxVal = 15, startVal = startMatrix)
         doesDiverge = iteration.diverges(matrices, 1)
         self.assertTrue(doesDiverge.any())
+
+    def testOutputToCsv(self):
+        iteration = maxIteration()
+        startMatrix = np.asarray(a=[[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+        allMatrices = iteration.allIterations(polynomial="2x", maxVal = 28, startVal = startMatrix)
+        toCsv(allMatrices, "outputTest.csv")
+
+    def testInputToCsv(self):
+        iteration = maxIteration()
+        matrices = readFile("testIdentities.csv")
+        values = []
+        for matrix in matrices:
+            allMatrices = iteration.allIterations(polynomial="2x", maxVal = 28, startVal = matrix)
+            values.append(allMatrices)
+        toCsv(values, "bigOutputTest.csv")
+
+
 
 
 
