@@ -194,3 +194,48 @@ class ParseTree():
         res = []
         self.bfs(queue, res)
         return res
+    
+    # Given a string representing a polynomial, verify the polynomial, returning
+    # that it is valid or a string representing the issue
+    def verifyPoly(self, poly):
+        poly = poly.replace(" ", "")
+
+        # check if polynomial is empty 
+        if len(poly) == 0:
+            return "Polynomial Cannot be Empty"
+
+        # check of poly contains any invalid characters
+        tokens = ['.', '*', '+', '-', '/', '^', '(', ')', 'x']
+
+        for c in poly:
+            if not c.isdigit() and c not in tokens:
+                return "Invalid Token Error"
+            
+        # check if parens do not match
+        parens = dict()
+        parens['('] = 0
+        parens[')'] = 0
+
+        for c in poly:
+            if c in ['(', ')']:
+                parens[c] += 1
+
+        if parens['('] != parens[')']:
+            return "Parentheses Mismatch Error"
+        
+        # check if an operator is put in the wrong spot
+        operators = ['^', '/', '*', '+', '-']
+        for i, c in enumerate(poly):
+            if c in operators and (i == 0 or i == len(poly) - 1):
+                return "Invalid Operation Error"
+            if c == '-' and poly[i+1] == '+':
+                continue
+            if c == '+' and poly[i+1] == '-':
+                continue
+            if c == '-' and poly[i+1] == '-':
+                continue
+            if c in operators and (i != len(poly) - 1 and (poly[i+1] in operators or poly[i+1] == ')')):
+                return "Invalid Operation Error"
+        
+        return "Valid"
+

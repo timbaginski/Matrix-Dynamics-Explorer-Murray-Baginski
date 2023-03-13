@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block headers %}
+<title>Matrix Dynamics Explorer</title>
+<script src="{% static 'verifyPoly.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-xl-6 col-md-8 col-sm-10 offset-xl-3 offset-md-2 offset-sm-1 text-center">
+            <div class="mt-4 mb-1 p-3 bg-light rounded">
+                <h1>Check for Convergence</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xl-6 col-md-8 col-sm-10 offset-xl-3 offset-md-2 offset-sm-1">
+            <form method="GET" action="http://localhost:8000/numberPoly">
+                <label for="polynomial">Polynomial</label>
+                <div class="form-group d-flex">
+                    <span class="input-group-text" id="polyPrefix">f(x) =</span>
+                    <input type="text" class="form-control" id="polynomial" name="polynomial" aria-describedby="polyPrefix">
+                </div>
+                <small id="usernametext" class="form-text error" style="color: #D30000;"></small>
+                <div class="form-group mt-1">
+                    <label for="num">Number</label>
+                    <input type="number" class="form-control" id="num" name="num">
+                </div>
+                <div class="form-group mt-1">
+                    <label for="maxIter">Max Iterations</label>
+                    <input type="number" class="form-control" id="maxIter" name="maxIter">
+                </div>
+                <div class="form-group mt-1">
+                    <label for="threshold">Threshold</label>
+                    <input type="number" step="0.01" class="form-control" id="threshold" name="threshold">
+                </div>
+                <div class="d-flex justify-content-center mt-1">
+                    <button type="button" class="btn btn-light" onclick="verifyPoly();">Verify Polynomial</button>
+                    <button type="submit" class="btn btn-light">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block headers %}
+<title>Loading...</title>
+
+{% csrf_token %}
+<script>
+    const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    let id = "{{id}}"; 
+    console.log(id);
+
+    // Allows us to pause in between checks
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function checkIteration() {
+        const loadingBar = document.getElementById('loadingBar');
+        const completed = document.getElementById('completed');
+        const status = document.getElementById('status');
+        let body = {id: id};
+
+        while(true) {
+            let response = await fetch('http://localhost:8000/checkIteration/', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrf_token
+                },
+                mode: "same-origin",
+                body: JSON.stringify(body)
+            });
+
+            let responseJSON = await response.json(); 
+            loadingBar.style.width = ((responseJSON['iteration'] / responseJSON['maxIter']) * 100).toString() + "%";
+            completed.innerHTML = "Completed " + responseJSON['iteration'] + " / " + responseJSON['maxIter'] + " Iterations";
+
+            if(responseJSON['iteration'] == responseJSON['maxIter'] && !responseJSON['converged']) {
+                status.innerHTML = "The polynomial/value pair ended up diverging"; 
+                break; 
+            }
+
+            if(responseJSON['converged']) {
+                status.innerHTML = 'The polynomial/value pair ended up converging at: ' + responseJSON['convergeValue']; 
+                loadingBar.style.width = "100%";
+                break; 
+            }
+
+            console.log(loadingBar.ariaValueNow);
+            await sleep(500)
+        }
+    }
+
+    async function startIteration() {
+        let body = {id: id};
+        let response = await fetch("http://localhost:8000/startIteration/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrf_token
+            },
+            mode: "same-origin",
+            body: JSON.stringify(body)
+        });
+
+        checkIteration();
+    }
+
+    startIteration(); 
+
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 col-sm-10 offset-xl-3 offset-md-2 offset-sm-1">
+            <h1 id="completed"></h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xl-6 col-md-8 col-sm-10 offset-xl-3 offset-md-2 offset-sm-1">
+            <div class="progress">
+                <div id="loadingBar" class="progress-bar" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width:0%; background-color: #55CEFF;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-10">
+        <div class="col-xl-6 col-md-8 col-sm-10 offset-xl-3 offset-md-2 offset-sm-1">
+            <p class="text-center" id="status"></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+.navbar-light {
+    background: #55CEFF;
+}
+
+.btn-light {
+    background: #55CEFF !important;
+}
+
+.bg-light {
+    background: #55CEFF !important;
+}
+
+.error {
+    color: #D30000 !important;
+}
