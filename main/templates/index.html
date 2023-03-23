@@ -4,6 +4,28 @@
 {% block headers %}
 <title>Matrix Dynamics Explorer</title>
 <script src="{% static 'verifyPoly.js' %}"></script>
+
+<script>
+    function clickNumber() {
+        const matrix = document.getElementById('matrix');
+        matrix.className = 'tab-pane fade'; 
+        const csv = document.getElementById('csv');
+        csv.className = 'tab-pane fade';
+    }
+    function clickMatrix() {
+        const number = document.getElementById('number');
+        number.className = 'tab-pane fade'; 
+        const csv = document.getElementById('csv');
+        csv.className = 'tab-pane fade';
+    }
+    function clickCsv() {
+        const matrix = document.getElementById('matrix');
+        matrix.className = 'tab-pane fade'; 
+        const number = document.getElementById('number');
+        number.className = 'tab-pane fade';
+    }
+
+</script>
 {% endblock %}
 
 {% block content %}
@@ -17,7 +39,18 @@
     </div>
     <div class="row">
         <div class="col-xl-6 col-md-8 col-sm-10 offset-xl-3 offset-md-2 offset-sm-1">
-            <form method="GET" action="http://localhost:8000/numberPoly">
+            <form method="GET" action="http://localhost:8000/matrixPoly"> 
+                <ul class="nav nav-tabs", role="tablist">
+                    <li class="nav-item" role="presentation">
+                      <a class="nav-link active" aria-current="page" onclick="return clickNumber();" data-bs-toggle="tab" data-bs-target="#number">Number</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                      <a class="nav-link" onclick="return clickMatrix();" data-bs-toggle="tab" data-bs-target="#matrix">Matrix</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                      <a class="nav-link" onclick="return clickCsv();" data-bs-toggle="tab" data-bs-target="#csv">Import File</a>
+                    </li>
+                  </ul>
                 <label for="polynomial">Polynomial</label>
                 <div class="form-group d-flex">
                     <span class="input-group-text" id="polyPrefix">f(x) =</span>
@@ -25,8 +58,18 @@
                 </div>
                 <small id="usernametext" class="form-text error" style="color: #D30000;"></small>
                 <div class="form-group mt-1">
-                    <label for="num">Number</label>
-                    <input type="number" class="form-control" id="num" name="num">
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade show active" id="number" role="tabpanel" aria-labelledby="number-tab">
+                            <label for="num">Starting Value</label>
+                            <input type="number" class="form-control" id="num" name="num">
+                        </div>
+                    </div>
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade" id="matrix" role="tabpanel" aria-labelledby="matrix-tab">
+                            <label for="matrix">Starting Matrix</label>
+                            <input type="text" class="form-control" id="matrix" name="matrix">
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group mt-1">
                     <label for="maxIter">Max Iterations</label>

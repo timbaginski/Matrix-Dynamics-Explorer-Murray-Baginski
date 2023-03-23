@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
+from .controller.parseTree.readMatrices import convert
 from .controller import iterationController
 from .controller.parseTree.parseTree import ParseTree
 from .models import Iteration
@@ -39,6 +40,23 @@ def numberPoly(request):
     context = {'id': id}
     return render(request, 'loading.html', context)
 
+def matrixPoly(request):
+    polynomial = request.GET.get('polynomial', '')
+    matrix = request.GET.get('matrix', '')
+    matrix = convert(matrix)
+    matrix = matrix.tolist()
+    matrix = json.dumps(matrix)
+    maxIter = request.GET.get('maxIter', '')
+    threshold = request.GET.get('threshold', '')
+
+    if len(polynomial) == 0 or len(matrix) == 0 or len(maxIter) == 0 or len(threshold) == 0:
+        return index(request)
+    
+    # insert new iteration into the database
+    id = iterationController.insertIteration(polynomial, matrix, maxIter, threshold)
+
+    context = {'id': id}
+    return render(request, 'loading.html', context)
 
 def startIteration(request):
     iterationObj = MaxIteration()

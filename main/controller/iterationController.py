@@ -8,7 +8,7 @@ def insertIteration(polynomial, num, maxIter, threshold):
         polynomial=polynomial, 
         currentIteration=0, 
         maxIteration=int(maxIter),
-        startValue=float(num),
+        startValue=num,
         threshold=float(threshold),
         converged=False
     )
