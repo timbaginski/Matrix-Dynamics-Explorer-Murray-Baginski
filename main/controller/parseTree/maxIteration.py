@@ -65,11 +65,15 @@ class MaxIteration():
             i += 1
         
         iteration.currentIteration = i
+        iteration.converged = not self.diverges(res, iteration.threshold)
         iteration.save()
+    
         return res
     
     # Based on results checks to see if threshold is reached
     def diverges(self, results, threshold):
+        if type(results[0]) == str and (results[0].isdigit() or results[0].replace('.','',1).isdigit()):
+            return float(results[-1]) - float(results[-2]) > threshold
         # print(results[len(results)-1] - results[len(results)-2])
         return (results[len(results)-1] - results[len(results)-2]) > threshold
     
