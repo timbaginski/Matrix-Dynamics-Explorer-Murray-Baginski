@@ -9,9 +9,12 @@ main\controller\parseTree\additionNode.py                                      2
 main\controller\parseTree\constantNode.py                                      10      2    80%
 main\controller\parseTree\divisionNode.py                                      14      3    79%
 main\controller\parseTree\exponentNode.py                                      17      4    76%
+main\controller\parseTree\maxIteration.py                                      28     10    64%
 main\controller\parseTree\multiplicationNode.py                                21      8    62%
 main\controller\parseTree\node.py                                              12      2    83%
-main\controller\parseTree\parseTree.py                                        148     27    82%
+main\controller\parseTree\outputCsv.py                                         10      0   100%
+main\controller\parseTree\parseTree.py                                        148     26    82%
+main\controller\parseTree\readMatrices.py                                      27      5    81%
 main\controller\parseTree\subtractionNode.py                                   21      8    62%
 main\controller\parseTree\variableNode.py                                      10      2    80%
 main\migrations\0001_initial.py                                                 5      0   100%
@@ -20,7 +23,7 @@ main\migrations\0003_alter_iteration_id.py                                      
 main\migrations\0004_iteration_convergevalue.py                                 4      0   100%
 main\migrations\__init__.py                                                     0      0   100%
 main\models.py                                                                 10      0   100%
-main\tests.py                                                                 104      0   100%
+main\tests.py                                                                 187      0   100%
 main\urls.py                                                                    3      0   100%
 main\views.py                                                                  44     16    64%
 manage.py                                                                      12      2    83%
@@ -28,4 +31,4 @@ mde\__init__.py                                                                 
 mde\settings.py                                                                19      0   100%
 mde\urls.py                                                                     3      0   100%
 -----------------------------------------------------------------------------------------------
-TOTAL                                                                         534    114    79%
+TOTAL                                                                         682    128    81%
