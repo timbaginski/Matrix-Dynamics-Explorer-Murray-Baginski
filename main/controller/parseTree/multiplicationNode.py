@@ -11,17 +11,18 @@ class MultiplicationNode(Node):
 
         if self.right != None:
             rightVal = self.right.getVal(x)
+
         
-        if type(leftVal) != np.array and type(rightVal) != np.array:
+        if type(leftVal) != np.ndarray and type(rightVal) != np.ndarray:
             return leftVal * rightVal
         
-        if type(leftVal) != np.array:
-            leftVal = np.multiply(leftVal, np.identity(n=x.shape()[0]))
+        if type(leftVal) != np.ndarray:
+            leftVal = np.multiply(leftVal, np.identity(n=x.shape[0]))
 
-        if type(rightVal) != np.array:
-            rightVal = np.multiply(rightVal, np.identity(n=x.shape()[0]))
+        if type(rightVal) != np.ndarray:
+            rightVal = np.multiply(rightVal, np.identity(n=x.shape[0]))
 
-        return np.matmult(leftVal, rightVal)
+        return np.matmul(leftVal, rightVal)
     
     def __str__(self):
         return '*'

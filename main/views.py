@@ -6,6 +6,7 @@ from .controller.parseTree.parseTree import ParseTree
 from .models import Iteration
 import threading
 import json
+from .controller.parseTree.maxIteration import MaxIteration
 
 # Create your views here.
 
@@ -33,31 +34,33 @@ def numberPoly(request):
         return index(request)
     
     # insert new iteration into the database
-    id = iterationController.insertIteration(polynomial, num, maxIter, threshold)
+    id = iterationController.insertIteration(polynomial, str(num), maxIter, threshold)
 
     context = {'id': id}
     return render(request, 'loading.html', context)
 
 
 def startIteration(request):
+    iterationObj = MaxIteration()
     bodyUnicode = request.body.decode('utf-8')
     body = json.loads(bodyUnicode)
     id = body['id']
 
     # start the process
-    x = threading.Thread(target=iterationController.startIteration, args=(id,))
+    x = threading.Thread(target=iterationObj.startIteration, args=(id,))
     x.start()
 
     return HttpResponse(status=202)
 
 def checkIterationStatus(request):
+    iterationObj = MaxIteration()
     bodyUnicode = request.body.decode('utf-8')
     body = json.loads(bodyUnicode)
     id = body['id']
     currIteration = iterationController.getCurrIteration(id)
     maxIteration = iterationController.getMaxIteration(id)
     converged = iterationController.getConverged(id)
-    convergeValue = iterationController.getConvergeValue(id)
+    convergeValue = iterationObj.getConvergeValue(id)
 
     response = {
         'iteration': currIteration,

@@ -7,8 +7,13 @@ class Iteration(RandomIDModel):
     polynomial = models.CharField(max_length=100, default='')
     currentIteration = models.IntegerField(default=0)
     maxIteration = models.IntegerField(default=0)
-    startValue = models.FloatField(default=0.0)
+    startValue = models.CharField(default='', max_length=10000)
     threshold = models.FloatField(default=0.0)
     converged = models.BooleanField(default=False)
-    convergeValue = models.FloatField(default=0.0)
+
+
+class IterationStep(models.Model):
+    iterationID = models.ForeignKey(to=Iteration, on_delete=models.CASCADE)
+    value = models.CharField(max_length=10000)
+    step = models.IntegerField(default=0)
 
