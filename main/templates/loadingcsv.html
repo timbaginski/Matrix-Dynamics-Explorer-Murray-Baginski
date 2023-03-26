@@ -55,6 +55,8 @@
         if(currentIter == ids.length) {
             const iterationsCompleted = document.getElementById('iterationsCompleted');
             iterationsCompleted.innerHTML = "Completed " + currentIter + " / " + ids.length + " Matrices";
+            const loadingBarIteration = document.getElementById('loadingBarIteration');
+            loadingBarIteration.style.width = (currentIter / ids.length * 100).toString() + '%';
             return;
         }
 
@@ -72,7 +74,8 @@
         const iterationsCompleted = document.getElementById('iterationsCompleted');
         iterationsCompleted.innerHTML = "Completed " + currentIter + " / " + ids.length + " Matrices";
         const loadingBarIteration = document.getElementById('loadingBarIteration');
-        loadingBarIteration.width = currentIter / ids.length; 
+        loadingBarIteration.style.width = (currentIter / ids.length * 100).toString() + '%'; 
+        console.log()
 
         await checkIteration();
         currentIter++;
