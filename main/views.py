@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
-from .controller.parseTree.readMatrices import convert
+from .controller.parseTree.readMatrices import convert, csvToMatrices
 from .controller import iterationController
 from .controller.parseTree.parseTree import ParseTree
 from .models import Iteration
@@ -89,6 +89,19 @@ def checkIterationStatus(request):
 
     return JsonResponse(response)
 
+def csvPoly(request):
+    csv = request.FILES['csv']
+    matrices = csvToMatrices(csv)
+    ids = []
+
+    for matrix in matrices:
+        ids.append(iterationController.insertIteration(request.POST["polynomial"], matrix, request.POST["maxIter"], request.POST["threshold"]))
+
+    context = {
+        'ids': json.dumps(ids)
+    }
+
+    return render(request, 'loadingcsv.html', context)
 
 
 

@@ -8,5 +8,6 @@ urlpatterns = [
     path('numberPoly/', views.numberPoly),
     path('startIteration/', views.startIteration),
     path('checkIteration/', views.checkIterationStatus),
-    path('matrixPoly/', views.matrixPoly)
+    path('matrixPoly/', views.matrixPoly),
+    path('csvPoly/', views.csvPoly)
 ]

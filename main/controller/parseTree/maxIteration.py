@@ -2,6 +2,7 @@ from .parseTree import ParseTree
 from ...models import Iteration, IterationStep
 import json
 import numpy as np
+from django.core.exceptions import ObjectDoesNotExist
 
 class MaxIteration():
 
@@ -22,8 +23,10 @@ class MaxIteration():
         elif startValue.replace('.','',1).isdigit():
             startValue = float(startValue)
         else:
+            print(startValue)
             startValue = list(json.loads(startValue))
             startValue = np.asarray(startValue)
+            startValue = startValue.astype('float32')
 
         value = poly.callPoly(startValue)
 
@@ -75,7 +78,14 @@ class MaxIteration():
         if type(results[0]) == str and (results[0].isdigit() or results[0].replace('.','',1).isdigit()):
             return float(results[-1]) - float(results[-2]) > threshold
         # print(results[len(results)-1] - results[len(results)-2])
-        return (results[len(results)-1] - results[len(results)-2]) > threshold
+        if type(results[0] == str):
+            results[-1] = json.loads(results[-1])
+            results[-2] = json.loads(results[-2])
+            results[-1] = np.asarray(results[-1])
+            results[-2] = np.asarray(results[-2])
+
+
+        return abs(np.linalg.norm(results[len(results)-1]) - np.linalg.norm(results[len(results)-2])) > threshold
     
     def showIteration(current, end):
         ## Line below is placeholder until we have frontend working
@@ -102,11 +112,11 @@ class MaxIteration():
             return None
         
         iterationSteps = IterationStep.objects.filter(iterationID=id)
-        iterationStep = iterationSteps.get(step=iteration.currentIteration - 1)
-
-        if iterationStep == None:
+        try:
+            iterationStep = iterationSteps.get(step=iteration.currentIteration - 1)
+        except ObjectDoesNotExist:
             return None
-
+        
         return iterationStep.value
     
     # starts the iteration when given an id

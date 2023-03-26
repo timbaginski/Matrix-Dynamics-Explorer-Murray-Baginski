@@ -8,6 +8,7 @@ django = "*"
 numpy = "*"
 coverage = "*"
 django-random-id-model = "*"
+pandas = "*"
 
 [dev-packages]
 
