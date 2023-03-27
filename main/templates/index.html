@@ -7,21 +7,26 @@
 
 <script>
     function clickNumber() {
+        turnOffMatNames();
         const matrix = document.getElementById('matrix');
         matrix.className = 'tab-pane fade'; 
         const csv = document.getElementById('csv');
         csv.className = 'tab-pane fade';
-        const form = document.getElementById('form');
+        const form = document.getElementById('polyForm');
         form.action = "http://localhost:8000/numberPoly";
         form.method = "GET";
     }
     function clickMatrix() {
+        addMatNames();
         const number = document.getElementById('number');
         number.className = 'tab-pane fade'; 
         const csv = document.getElementById('csv');
         csv.className = 'tab-pane fade';
+        const form = document.getElementById('polyForm');
+        form.action = "http://localhost:8000/matrixPoly";
     }
     function clickCsv() {
+        turnOffMatNames();
         const matrix = document.getElementById('matrix');
         matrix.className = 'tab-pane fade'; 
         const number = document.getElementById('number');
@@ -29,6 +34,70 @@
         const form = document.getElementById('polyForm');
         form.action = "http://localhost:8000/csvPoly/"; 
         form.method = "POST";
+    }
+
+    function changeMat(selectObj) {
+        let newDim = selectObj.selectedIndex + 2; 
+        let matForms = document.getElementsByClassName('matForm');
+        let matCols = document.getElementsByClassName('matCol');
+        let matRow = document.getElementById('matRow');
+        let currentDim = Math.sqrt(matForms.length); 
+        let boxesToAdd = newDim - currentDim; 
+        console.log(boxesToAdd);
+
+        if(boxesToAdd == 0) {
+            return; 
+        }
+
+        // If Boxes are removed we need to remove one matCol and one form from each matCol for each removal
+        if(boxesToAdd < 0) {
+            for(let i = 0; i < currentDim - newDim; i++) {
+                matCols[matCols.length - 1].remove();
+                for(let j = 0; j < matCols.length; j++) {
+                    matCols[j].children[matCols[j].children.length-1].remove();
+                }
+            }
+        }
+
+        // Otherwise, we need to add new matCols and matForms
+        else {
+            for(let i = 0; i < boxesToAdd; i++) {
+                newMatCol = matCols[0].cloneNode(true); 
+                matRow.appendChild(newMatCol);
+                matCols = document.getElementsByClassName('matCol');
+
+                for(let j = 0; j < newMatCol.children.length; j++) {
+                    newMatCol.children[j].children[0].setAttribute('name', (matRow.children.length-1).toString() + j.toString());
+                }
+
+                for(let j = 0; j < matCols.length; j++) {
+                    
+                    newMatForm = matCols[0].children[0].cloneNode(true); 
+                    matCols[j].appendChild(newMatForm);
+                    newMatForm.children[0].setAttribute('name', j.toString() + (matCols[j].children.length - 1).toString());
+                    //console.log(newMatForm.children[0].name);
+                }
+            }
+        }
+
+        matInput = document.getElementById('matInput');
+        console.log(matInput);
+    }
+
+    function turnOffMatNames() {
+        matBoxes = document.getElementsByClassName('matBox');
+        for(let i = 0; i < matBoxes.length; i++) {
+            matBoxes[i].removeAttribute('name');
+        }
+    }
+
+    function addMatNames() {
+        matCols = document.getElementsByClassName('matCol');
+        for(let i = 0; i < matCols.length; i++) {
+            for(let j = 0; j < matCols[i].children.length; j++) {
+                matCols[i].children[j].children[0].setAttribute('name', i.toString() + j.toString());
+            }
+        }
     }
 
 </script>
@@ -79,8 +148,33 @@
                     </div>
                     <div class="tab-content" id="myTabContent">
                         <div class="tab-pane fade" id="matrix" role="tabpanel" aria-labelledby="matrix-tab">
-                            <label for="matrix">Starting Matrix</label>
-                            <input type="text" class="form-control" id="matrix" name="matrix">
+                            <label for="matrix">Matrix Size</label>
+                            <select class="form-select" id="matrix" name="matrix" onChange="changeMat(this);">
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                            <div id="matInput">
+                                <div class="row g-1 justify-content-center mt-1" id="matRow">
+                                    <div class="col-md-1 col-2 matCol">
+                                      <div class="form-group mt-1 matForm">
+                                        <input type="text" class="form-control matBox" name="00">
+                                      </div>
+                                      <div class="form-group mt-1 matForm">
+                                        <input type="text" class="form-control matBox" name="01">
+                                      </div>
+                                    </div>
+                                    <div class="col-md-1 col-2 matCol">
+                                      <div class="form-group mt-1 matForm">
+                                        <input type="text" class="form-control matBox" name="10">
+                                      </div>
+                                      <div class="form-group mt-1 matForm">
+                                        <input type="text" class="form-control matBox" name="11">
+                                      </div>
+                                    </div>
+                                  </div>
+                            </div>
                         </div>
                     </div>
                 </div>

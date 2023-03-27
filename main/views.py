@@ -41,8 +41,24 @@ def numberPoly(request):
     return render(request, 'loading.html', context)
 
 def matrixPoly(request):
+    print(request.GET)
     polynomial = request.GET.get('polynomial', '')
-    matrix = request.GET.get('matrix', '')
+    matrix = ""
+    indices = []
+    for i in range(5):
+        for j in range(5):
+            indices.append(str(j) + str(i))
+
+    for index in indices:
+        value = request.GET.get(index, '')
+        if value == '':
+            continue
+        matrix += value + ','
+
+    matrix = matrix[:len(matrix)-1]
+
+    print(matrix)
+
     matrix = convert(matrix)
     matrix = matrix.tolist()
     matrix = json.dumps(matrix)

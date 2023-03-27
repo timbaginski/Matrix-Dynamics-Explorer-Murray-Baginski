@@ -13,3 +13,7 @@
 .error {
     color: #D30000 !important;
 }
+
+.matBox {
+    text-align: center;
+}
