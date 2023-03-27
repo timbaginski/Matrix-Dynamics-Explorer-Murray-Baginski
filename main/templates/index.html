@@ -4,6 +4,7 @@
 {% block headers %}
 <title>Matrix Dynamics Explorer</title>
 <script src="{% static 'verifyPoly.js' %}"></script>
+<script src="{% static 'verifyFile.js' %}"></script>
 
 <script>
     function clickNumber() {
@@ -130,6 +131,7 @@
                     <div class="tab-content" id="myTabContent">
                         <div class="tab-pane fade" id="csv" role="tabpanel" aria-labelledby="csv-tab">
                             <input type="file" accept=".csv" name="csv"></input>
+                            <button type="button" class="btn btn-light" onclick="verifyFile();">Verify File</button>
                         </div>
                     </div>
                 </div>
@@ -150,10 +152,14 @@
                         <div class="tab-pane fade" id="matrix" role="tabpanel" aria-labelledby="matrix-tab">
                             <label for="matrix">Matrix Size</label>
                             <select class="form-select" id="matrix" name="matrix" onChange="changeMat(this);">
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
+                                <option value="2">2x2</option>
+                                <option value="3">3x3</option>
+                                <option value="4">4x4</option>
+                                <option value="5">5x5</option>
+                                <option value="5">6x6</option>
+                                <option value="5">7x7</option>
+                                <option value="5">8x8</option>
+                                <option value="5">9x9</option>
                             </select>
                             <div id="matInput">
                                 <div class="row g-1 justify-content-center mt-1" id="matRow">

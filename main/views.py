@@ -41,6 +41,7 @@ def numberPoly(request):
     return render(request, 'loading.html', context)
 
 def matrixPoly(request):
+    print("new request:")
     print(request.GET)
     polynomial = request.GET.get('polynomial', '')
     matrix = ""
