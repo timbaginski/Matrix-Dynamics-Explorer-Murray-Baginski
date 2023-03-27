@@ -1,4 +1,5 @@
 from django.test import TestCase, Client
+from django.db import transaction
 from .controller.parseTree.parseTree import ParseTree
 import numpy as np
 from .controller.parseTree.maxIteration import MaxIteration
@@ -6,6 +7,7 @@ from .controller.parseTree.readMatrices import readFile
 from .controller.parseTree.outputCsv import toCsv
 import json
 from .models import Iteration, IterationStep
+from django.core.files.uploadedfile import InMemoryUploadedFile, SimpleUploadedFile
 
 
 class ParseTestCase(TestCase):
@@ -268,6 +270,7 @@ class ViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
     # test whether we can start an iteration for an inserted polynomial
+    @transaction.atomic
     def testStartIteration(self):
         # insert a poly
         c = Client()
@@ -288,9 +291,39 @@ class ViewsTestCase(TestCase):
 
             response_id_index += 1
 
-        #response = c.post('/startIteration/', json.dumps({'id': id_str}), content_type='application/json')
-        #self.assertEqual(response.status_code, 202)
+        response = c.post('/startIteration/', json.dumps({'id': id_str}), content_type='application/json')
+        status = response.status_code
+        print("my status:")
+        print(status)
+        self.assertEqual(status, 202)
 
+    def testCsvPoly(self):
+        c = Client()
+        with open('testIdentities.csv', 'r') as f:
+            postResponse = c.post('/csvPoly/',
+                {
+                    'polynomial': '5x',
+                    'maxIter': '10',
+                    'threshold': '.2',
+                    'csv': InMemoryUploadedFile(f, "file_content", 'testIdentities.csv', 'csv', 5000, 0),
+                }
+            )
+        self.assertEqual(postResponse.status_code, 200)
+
+    def testMatrixPoly(self):
+        c = Client()
+        #response = c.get('/matrixPoly/?polynomial=x%20%2B%203&MATRIX&maxIter=100&threshold=0.1')
+        getResponse = c.get('/matrixPoly/',
+                {
+                    'polynomial': '5x',
+                    'maxIter': '10',
+                    'threshold': '.2',
+                    '00': '1',
+                    '01': '0',
+                    '10': '0',
+                    '11': '1'
+                })
+        self.assertEqual(getResponse.status_code, 200)
 
 
 
