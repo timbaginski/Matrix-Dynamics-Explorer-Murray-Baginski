@@ -1,8 +1,9 @@
 async function verifyFile() {
-    print("Verifying...")
-    let filename = document.getElementById('filename').value; 
-
-    const response = await fetch('http://localhost:8000/verifyFile/?filename=' + filename); 
+    // get the uploaded file
+    let fileInput = document.getElementsByName("csv")[0];
+    let file = fileInput.files[0];
+    console.log("Verifying...");
+    const response = await fetch('http://localhost:8000/verifyFile/?filename=' + file); 
     let responseJSON = await response.json(); 
 
     let usernametext = document.getElementById('usernametext');
