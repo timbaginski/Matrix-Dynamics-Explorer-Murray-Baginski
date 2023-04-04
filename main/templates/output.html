@@ -51,6 +51,7 @@
           const cols = matrix[0].length;
           // Create a new HTML table for the matrix
           const matrixTable = document.createElement('table');
+          matrixTable.style.tableLayout = 'fixed'; // set table layout to fixed
           // Loop through each row of the matrix
           for (let r = 0; r < rows; r++) {
             // Create a new HTML row for the matrix row
@@ -58,13 +59,13 @@
             for (let c = 0; c < cols; c++) {
               const cell = document.createElement('td');
               cell.innerText = matrix[r][c];
-              cell.style.whiteSpace = "wrap";
+              cell.style.whiteSpace = 'wrap';
               row.appendChild(cell);
             }
             const title = document.createElement('td');
-            title.innerText = "Iteration " + r.toString() + " : "
-            title.style.whiteSpace = "nowrap";
-            matrixTable.appendChild(title);
+            title.innerText = 'Iteration ' + r.toString() + ' : ';
+            title.style.whiteSpace = 'nowrap';
+            row.insertBefore(title, row.firstChild); // insert title at the beginning of the row
             matrixTable.appendChild(row);
           }
           matrixTable.style.border = '1px solid black';
@@ -196,7 +197,7 @@
     <div class="row">
         <div class="col-xl-6 col-md-8 col-sm-10 offset-xl-3 offset-md-2 offset-sm-1 text-center">
             <div class="mt-4 mb-1 p-3 bg-light rounded">
-                status.innerHTML = 'data: ' + data;</h1>
+                View output</h1>
             </div>
         </div>
     </div>
@@ -208,7 +209,7 @@
                       <a class="nav-link active" aria-current="page" onclick="return clickNumber();" data-bs-toggle="tab" data-bs-target="#number">Number</a>
                     </li>
                     <li class="nav-item" role="presentation">
-                      <a class="nav-link" onclick="return clickMatrix();" data-bs-toggle="tab" data-bs-target="#matrix">Matrix</a>
+                      <a class="nav-link" onclick="return clickMatrix();" data-bs-toggle="tab" data-bs-target="#matrix">All Matricies</a>
                     </li>
                     <li class="nav-item" role="presentation">
                       <a class="nav-link" onclick="return clickCsv();" data-bs-toggle="tab" data-bs-target="#csv">Import File</a>
@@ -222,11 +223,6 @@
                         </div>
                     </div>
                 </div>
-                <label for="polynomial">Polynomial</label>
-                <div class="form-group d-flex">
-                    <span class="input-group-text" id="polyPrefix">f(x) =</span>
-                    <input type="text" class="form-control" id="polynomial" name="polynomial" aria-describedby="polyPrefix">
-                </div>
                 <small id="usernametext" class="form-text error" style="color: #D30000;"></small>
                 <div class="form-group mt-1">
                     <div class="tab-content" id="myTabContent">
@@ -238,19 +234,11 @@
                     <div class="tab-content" id="myTabContent">
                         <div class="tab-pane fade" id="matrix" role="tabpanel" aria-labelledby="matrix-tab">
                             <div id="matInput">
-                                <table id="matrix-table"></table>
+                                <table id="matrix-table" style="max-height: 200px; overflow-y: scroll;  overflow-x: auto; width: 100%; table-layout: fixed;";></table>
 
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="form-group mt-1">
-                    <label for="maxIter">Max Iterations</label>
-                    <input type="number" class="form-control" id="maxIter" name="maxIter">
-                </div>
-                <div class="form-group mt-1">
-                    <label for="threshold">Threshold</label>
-                    <input type="number" step="0.01" class="form-control" id="threshold" name="threshold">
                 </div>
                 <div class="d-flex justify-content-center mt-1">
                     <button type="button" class="btn btn-light" onclick="verifyPoly();">Verify Polynomial</button>
