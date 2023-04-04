@@ -1,20 +1,236 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <link rel="stylesheet" href="{% static 'style.css' %}">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-    {% block headers %}
-    {% endblock %}
-</head>
+
+{% block headers %}
+<title>Matrix Dynamics Explorer</title>
+<script src="{% static 'verifyPoly.js' %}"></script> 
+<script src="{% static 'matPopulate.js' %}"></script>
+<script src="{% static 'verifyFile.js' %}"></script>
+{% csrf_token %}
+<script>
+    const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    async function fetchOutput(id) {
+        console.log("matrices:")
+        body = {
+            'id': id
+        }
+        let response = await fetch('http://localhost:8000/fetchOutput/', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrf_token
+            },
+            mode: "same-origin",
+            body: JSON.stringify(body)
+        });
+
+        let responseJSON = await response.json(); 
+        matrices = responseJSON['matrices']
+        console.log(matrices)
+    
+    }
+
+    function clickNumber() {
+        turnOffMatNames();
+        const matrix = document.getElementById('matrix');
+        matrix.className = 'tab-pane fade'; 
+        const csv = document.getElementById('csv');
+        csv.className = 'tab-pane fade';
+        const form = document.getElementById('polyForm');
+        form.action = "http://localhost:8000/numberPoly";
+        form.method = "GET";
+    }
+    async function clickMatrix() {
+        addMatNames();
+        let id = "{{id}}"; 
+        console.log("My current id:")
+        console.log(id)
+        await fetchOutput(id)
+        const number = document.getElementById('number');
+        number.className = 'tab-pane fade'; 
+        const csv = document.getElementById('csv');
+        csv.className = 'tab-pane fade';
+        const form = document.getElementById('polyForm');
+        form.action = "http://localhost:8000/matrixPoly";
+    }
+    function clickCsv() {
+        turnOffMatNames();
+        const matrix = document.getElementById('matrix');
+        matrix.className = 'tab-pane fade'; 
+        const number = document.getElementById('number');
+        number.className = 'tab-pane fade';
+        const form = document.getElementById('polyForm');
+        form.action = "http://localhost:8000/csvPoly/"; 
+        form.method = "POST";
+    }
+
+    function changeMat(selectObj) {
+        let newDim = selectObj.selectedIndex + 2; 
+        let matForms = document.getElementsByClassName('matForm');
+        let matCols = document.getElementsByClassName('matCol');
+        let matRow = document.getElementById('matRow');
+        let currentDim = Math.sqrt(matForms.length); 
+        let boxesToAdd = newDim - currentDim; 
+        console.log(boxesToAdd);
+
+        if(boxesToAdd == 0) {
+            return; 
+        }
+
+        // If Boxes are removed we need to remove one matCol and one form from each matCol for each removal
+        if(boxesToAdd < 0) {
+            for(let i = 0; i < currentDim - newDim; i++) {
+                matCols[matCols.length - 1].remove();
+                for(let j = 0; j < matCols.length; j++) {
+                    matCols[j].children[matCols[j].children.length-1].remove();
+                }
+            }
+        }
+
+        // Otherwise, we need to add new matCols and matForms
+        else {
+            for(let i = 0; i < boxesToAdd; i++) {
+                newMatCol = matCols[0].cloneNode(true); 
+                matRow.appendChild(newMatCol);
+                matCols = document.getElementsByClassName('matCol');
+
+                for(let j = 0; j < newMatCol.children.length; j++) {
+                    newMatCol.children[j].children[0].setAttribute('name', (matRow.children.length-1).toString() + j.toString());
+                }
+
+                for(let j = 0; j < matCols.length; j++) {
+                    
+                    newMatForm = matCols[0].children[0].cloneNode(true); 
+                    matCols[j].appendChild(newMatForm);
+                    newMatForm.children[0].setAttribute('name', j.toString() + (matCols[j].children.length - 1).toString());
+                    //console.log(newMatForm.children[0].name);
+                }
+            }
+        }
+
+        matInput = document.getElementById('matInput');
+        console.log(matInput);
+    }
+
+    function turnOffMatNames() {
+        matBoxes = document.getElementsByClassName('matBox');
+        for(let i = 0; i < matBoxes.length; i++) {
+            matBoxes[i].removeAttribute('name');
+        }
+    }
+
+    function addMatNames() {
+        matCols = document.getElementsByClassName('matCol');
+        for(let i = 0; i < matCols.length; i++) {
+            for(let j = 0; j < matCols[i].children.length; j++) {
+                matCols[i].children[j].children[0].setAttribute('name', i.toString() + j.toString());
+            }
+        }
+    }
+
+</script>
+{% endblock %}
+
+{% block content %}
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Matrix Dynamics Explorer</a>
+<div class="container">
+    
+    <div class="row">
+        <div class="col-xl-6 col-md-8 col-sm-10 offset-xl-3 offset-md-2 offset-sm-1 text-center">
+            <div class="mt-4 mb-1 p-3 bg-light rounded">
+                status.innerHTML = 'data: ' + data;</h1>
+            </div>
         </div>
-    </nav>
-    {% block content %}
-    {% endblock %}
+    </div>
+    <div class="row">
+        <div class="col-xl-6 col-md-8 col-sm-10 offset-xl-3 offset-md-2 offset-sm-1">
+            <form method="GET" action="http://localhost:8000/numberPoly" id="polyForm" enctype="multipart/form-data">{% csrf_token %}
+                <ul class="nav nav-tabs", role="tablist">
+                    <li class="nav-item" role="presentation">
+                      <a class="nav-link active" aria-current="page" onclick="return clickNumber();" data-bs-toggle="tab" data-bs-target="#number">Number</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                      <a class="nav-link" onclick="return clickMatrix();" data-bs-toggle="tab" data-bs-target="#matrix">Matrix</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                      <a class="nav-link" onclick="return clickCsv();" data-bs-toggle="tab" data-bs-target="#csv">Import File</a>
+                    </li>
+                  </ul>
+                  <div class="form-group d-flex justify-content-center mt-3">
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade" id="csv" role="tabpanel" aria-labelledby="csv-tab">
+                            <input type="file" accept=".csv" name="csv"></input>
+                            <button type="button" class="btn btn-light" onclick="verifyFile();">Verify File</button>
+                        </div>
+                    </div>
+                </div>
+                <label for="polynomial">Polynomial</label>
+                <div class="form-group d-flex">
+                    <span class="input-group-text" id="polyPrefix">f(x) =</span>
+                    <input type="text" class="form-control" id="polynomial" name="polynomial" aria-describedby="polyPrefix">
+                </div>
+                <small id="usernametext" class="form-text error" style="color: #D30000;"></small>
+                <div class="form-group mt-1">
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade show active" id="number" role="tabpanel" aria-labelledby="number-tab">
+                            <label for="num">Starting Value</label>
+                            <input type="number" class="form-control" id="num" name="num">
+                        </div>
+                    </div>
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade" id="matrix" role="tabpanel" aria-labelledby="matrix-tab">
+                            <label for="matrix">Matrix Size</label>
+                            <select class="form-select" id="matrixSize" name="matrix" onChange="changeMat(this);">
+                                <option value="2">2x2</option>
+                                <option value="3">3x3</option>
+                                <option value="4">4x4</option>
+                                <option value="5">5x5</option>
+                                <option value="6">6x6</option>
+                                <option value="7">7x7</option>
+                                <option value="8">8x8</option>
+                                <option value="9">9x9</option>
+                            </select>
+                            <div id="matInput">
+                                <div class="row g-1 justify-content-center mt-1" id="matRow">
+                                    <div class="col-md-1 col-2 matCol">
+                                      <div class="form-group mt-1 matForm">
+                                        <input type="text" class="form-control matBox" name="00">
+                                      </div>
+                                      <div class="form-group mt-1 matForm">
+                                        <input type="text" class="form-control matBox" name="01">
+                                      </div>
+                                    </div>
+                                    <div class="col-md-1 col-2 matCol">
+                                      <div class="form-group mt-1 matForm">
+                                        <input type="text" class="form-control matBox" name="10">
+                                      </div>
+                                      <div class="form-group mt-1 matForm">
+                                        <input type="text" class="form-control matBox" name="11">
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="d-flex justify-content-center mt-1">
+                                    <button type="button" class="btn btn-light" onclick="matPopulate();">Populate with random values</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group mt-1">
+                    <label for="maxIter">Max Iterations</label>
+                    <input type="number" class="form-control" id="maxIter" name="maxIter">
+                </div>
+                <div class="form-group mt-1">
+                    <label for="threshold">Threshold</label>
+                    <input type="number" step="0.01" class="form-control" id="threshold" name="threshold">
+                </div>
+                <div class="d-flex justify-content-center mt-1">
+                    <button type="button" class="btn btn-light" onclick="verifyPoly();">Verify Polynomial</button>
+                    <button type="submit" class="btn btn-light">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 </body>
-</html>
+{% endblock %}

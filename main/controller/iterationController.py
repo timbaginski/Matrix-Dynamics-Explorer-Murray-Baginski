@@ -1,4 +1,4 @@
-from ..models import Iteration
+from ..models import Iteration, IterationStep
 from ..controller.parseTree.parseTree import ParseTree
 
 # insert new iteration object into the db so we can start the iteration 
@@ -58,6 +58,13 @@ def getMaxIteration(id):
         return 0
     
     return iteration.maxIteration
+
+def getAllIterations(id):
+    print("trying id")
+    print(id)
+    iterations = IterationStep.objects.filter(iterationID_id=id)
+    print(iterations)
+    return iterations
 
 # Return whether the current iteration has converged
 def getConverged(id):

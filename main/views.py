@@ -108,6 +108,25 @@ def checkIterationStatus(request):
 
     return JsonResponse(response)
 
+def fetchOutput(request):
+    bodyUnicode = request.body.decode('utf-8')
+    body = json.loads(bodyUnicode)
+    id = body['id']
+    iterations = iterationController.getAllIterations(id)
+    print("my matrices:")
+    matrices = list(iterations)
+
+    for i in range(len(matrices)):
+        matrices[i] = matrices[i].value
+    print(matrices)
+
+    response = {
+        'matrices': json.dumps(matrices)
+    }
+
+    return JsonResponse(response)
+
+
 def csvPoly(request):
     csv = request.FILES['csv']
     matrices = csvToMatrices(csv)
@@ -124,28 +143,16 @@ def csvPoly(request):
 
 def output(request):
     ids = [5]
-    #id = request.session.get('id')
-    polynomial = request.GET.get('polynomial', '')
-    polynomial = '2x'
-    #id = iterationController.getLatestIterationByPolynomial(polynomial).id
-    print("id")
-    print(id)
-    polynomial = request.GET.get('polynomial', '')
+    id = request.GET.get('loadingID', '')
+
     print("polynomial:")
-    print(polynomial)
    # allMatrices = iterationController.getAllIterations(id)
-    num = request.GET.get('num', '')
-    maxIter = request.GET.get('maxIter', '')
-    threshold = request.GET.get('threshold', '')
-    ids.append(polynomial)
     #id = body['id']
     # ids = getOutput()
     context = {
         'id': id,
     }
-    print('Context: %s', context)
-    print('Request: %s', request)
-    print(allMatrices)
+    #print(allMatrices)
     #print('id:', id)
 
     return render(request, 'output.html', context)

@@ -8,7 +8,7 @@
 <script>
     const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
     let id = "{{id}}"; 
-    console.log(id);
+    //console.log(id);
 
     // Allows us to pause in between checks
     function sleep(ms) {
@@ -16,6 +16,9 @@
     }
 
     async function checkIteration() {
+        const loadingID = document.getElementById('loadingID'); 
+        loadingID.value = id; 
+        console.log(loadingID.value);
         const loadingBar = document.getElementById('loadingBar');
         const completed = document.getElementById('completed');
         const status = document.getElementById('status');
@@ -76,12 +79,13 @@
     }
 
     startIteration(); 
+    
 
 </script>
 {% endblock %}
 
 {% block content %}
-<body style="background-color: #C8A2C8;">
+<body>
 <div class="container">
     <div class="row">
         <div class="col-md-8 col-sm-10 offset-xl-3 offset-md-2 offset-sm-1">
@@ -132,8 +136,9 @@
                     Eigenvectors
                 </label>
             </div>
-            <form action="{% url 'output' %}">
+            <form action="http://localhost:8000/output">
                 <button type="submit" class="btn btn-light">View output</button>
+                <input type="hidden" id="loadingID", name="loadingID">
             </form>
         </div>
     </div>
