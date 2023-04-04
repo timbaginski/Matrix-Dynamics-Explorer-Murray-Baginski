@@ -40,6 +40,7 @@ def numberPoly(request):
     context = {'id': id}
     return render(request, 'loading.html', context)
 
+
 def matrixPoly(request):
     print("new request:")
     print(request.GET)
@@ -87,6 +88,7 @@ def startIteration(request):
 
     return HttpResponse(status=202)
 
+
 def checkIterationStatus(request):
     iterationObj = MaxIteration()
     bodyUnicode = request.body.decode('utf-8')
@@ -120,7 +122,33 @@ def csvPoly(request):
 
     return render(request, 'loadingcsv.html', context)
 
+def output(request):
+    ids = [5]
+    #id = request.session.get('id')
+    polynomial = request.GET.get('polynomial', '')
+    polynomial = '2x'
+    #id = iterationController.getLatestIterationByPolynomial(polynomial).id
+    print("id")
+    print(id)
+    polynomial = request.GET.get('polynomial', '')
+    print("polynomial:")
+    print(polynomial)
+   # allMatrices = iterationController.getAllIterations(id)
+    num = request.GET.get('num', '')
+    maxIter = request.GET.get('maxIter', '')
+    threshold = request.GET.get('threshold', '')
+    ids.append(polynomial)
+    #id = body['id']
+    # ids = getOutput()
+    context = {
+        'id': id,
+    }
+    print('Context: %s', context)
+    print('Request: %s', request)
+    print(allMatrices)
+    #print('id:', id)
 
+    return render(request, 'output.html', context)
 
 
 
