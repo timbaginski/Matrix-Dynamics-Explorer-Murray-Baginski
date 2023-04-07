@@ -12,13 +12,13 @@ class AdditionNode(Node):
         if self.right != None:
             rightVal = self.right.getVal(x)
 
-        if type(leftVal) != np.array and type(rightVal) != np.array:
+        if type(leftVal) != np.ndarray and type(rightVal) != np.ndarray:
             return leftVal + rightVal
         
-        if type(leftVal) != np.array:
+        if type(leftVal) != np.ndarray:
             leftVal = np.multiply(leftVal, np.identity(n=x.shape()[0]))
 
-        if type(rightVal) != np.array:
+        if type(rightVal) != np.ndarray:
             rightVal = np.multiply(rightVal, np.identity(n=x.shape()[0]))
 
         return np.add(leftVal, rightVal)

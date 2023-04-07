@@ -12,7 +12,7 @@ class ExponentNode(Node):
         if self.right != None:
             rightVal = self.right.getVal(x)
 
-        if type(leftVal) != np.array:
+        if type(leftVal) != np.ndarray:
             return leftVal ** rightVal
 
         return np.linalg.matrix_power(leftVal, rightVal)
