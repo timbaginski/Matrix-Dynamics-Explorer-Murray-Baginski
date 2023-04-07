@@ -16,10 +16,10 @@ class SubtractionNode(Node):
             return leftVal - rightVal
         
         if type(leftVal) != np.ndarray:
-            leftVal = np.multiply(leftVal, np.identity(n=x.shape()[0]))
+            leftVal = np.multiply(leftVal, np.identity(n=x.shape[0]))
 
         if type(rightVal) != np.ndarray:
-            rightVal = np.multiply(rightVal, np.identity(n=x.shape()[0]))
+            rightVal = np.multiply(rightVal, np.identity(n=x.shape[0]))
 
         return np.subtract(leftVal, rightVal)
     
