@@ -12,6 +12,7 @@
 
     let eigenvalues = [];
     let norms = [];
+    let chart = null; 
 
     const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
     async function fetchOutput(id) {
@@ -124,7 +125,7 @@
       }
 
       function graphNorm(norms) {
-        console.log(norms.length)
+        console.log(norms)
         const ctx = document.getElementById('myChart'); 
 
         let labels = [];
@@ -160,33 +161,109 @@
             }
         };
 
-        new Chart(ctx, config);
+        chart = new Chart(ctx, config);
       }
 
-      function displayEigenvalues() {
+      async function displayEigenvalues() {
         const output = document.getElementById('output');
-        const eigenvals = document.createElement('div');
-        eigenvals.setAttribute('id', 'eigenvals');
+        const ctx = document.getElementById('myChart');
+        chart.destroy();
 
-        output.className = 'list-group';
-
+        let mini = Number.MAX_VALUE;
+        let maxi = Number.MIN_VALUE;
+        
         for(let i = 0; i < eigenvalues.length; i++) {
-            let temp = document.createElement('li');
-            temp.className = 'list-group-item';
-            
-            let s = "";
             for(let j = 0; j < eigenvalues[i].length; j++) {
-                s = s + eigenvalues[i][j] + ', ';
+                mini = Math.min(mini, eigenvalues[i][j]);
+                maxi = Math.max(maxi, eigenvalues[i][j]);
             }
-
-            s = s.substring(0, s.length - 1);
-            temp.innerHTML = s;
-
-            eigenvals.appendChild(temp);
         }
 
-        removeAllChildNodes(output);
-        output.appendChild(eigenvals);
+        for(let i = 0; i < eigenvalues.length; i++) {
+            data = []
+
+            for(let j = 0; j < eigenvalues[i].length; j++) {
+                data.push({
+                    x: eigenvalues[i][j],
+                    y: 0.1
+                });
+            }
+
+            if(i > 0) {
+                chart.data.datasets.forEach((dataset) => {
+                    while(dataset.data.length > 0) {
+                        dataset.data.pop();
+                    }
+                });
+
+                chart.data.datasets.forEach((dataset) => {
+                    for(let j = 0; j < data.length; j++) {
+                        dataset.data.push(data[j]);
+                    }
+                });
+
+                chart.update();
+
+                await sleep(500);
+                continue;
+            }
+            
+            chart = new Chart('myChart', {
+                type: "scatter",
+                data: {
+                    datasets: [{
+                        data: data,
+                        backgroundColor: "#0168FF",
+                        borderColor: "#0168FF",
+                        pointBackgroundColor: "white",
+                        pointBorderWidth: 1,      
+                        lineTension: 0,
+                        pointBorderColor: "blue",
+                        pointRadius: 4,
+                        pointHoverRadius: 4,
+                    }],
+                },
+                options: {
+                    plugins: {
+                        datalabels: {
+                            align: 'top',
+                            formatter: function(value, context) {
+                                return context.dataIndex + 1;
+                            }
+                        }
+                    },
+                    layout: {
+                        padding: {
+                            right: 0
+                        }
+                    },
+                    legend: {
+                        display: false
+                    },
+                    tooltips: {
+                        enabled: false
+                    },
+                    scales: {
+                        y: {
+                            display: false,
+                            min: 0,
+                            max: 1
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            min: mini - 5,
+                            max: maxi + 5 
+                        }
+                    }
+                }
+            });
+
+            await sleep(500);
+
+        }
+        
       }
 
       function changeOutput(obj) {
@@ -201,6 +278,11 @@
         while (parent.firstChild) {
             parent.removeChild(parent.firstChild);
         }   
+      }
+
+      // Allows us to pause in between checks
+      function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
       }
 
       fetchOutput("{{id}}");
@@ -227,7 +309,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-xl-6 col-md-8 col-sm-12 offset-xl-3 offset-md-2 offset-sm-1 text-center" id="output">
+        <div class="col-xl-6 col-md-8 col-sm-12 offset-xl-3 offset-md-2 offset-sm-1 text-center justify-content-center" id="output">
             <canvas id="myChart">
             </canvas>
         </div>
