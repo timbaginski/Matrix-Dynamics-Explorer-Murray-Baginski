@@ -128,3 +128,23 @@ class MaxIteration():
         
         self.allIterations(iteration)
 
+    # Returns the norm for each iteration step
+    def getNorms(self, matrices):
+        res = []
+        for i in range(len(matrices)):
+            matrices[i] = json.loads(matrices[i])
+            matrices[i] = np.asarray(matrices[i])
+
+            if i > 0:
+                res.append(abs(np.linalg.norm(matrices[i] - matrices[i-1])))
+
+        print(res)
+        return res
+    
+    # Returns the eigenvalues for each matrix
+    def getEigenvalues(self, matrices):
+        res = []
+        for i in range(len(matrices)):
+            res.append(np.linalg.eigvals(matrices[i]))
+
+        return res

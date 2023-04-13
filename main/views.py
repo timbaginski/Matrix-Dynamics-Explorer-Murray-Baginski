@@ -8,6 +8,7 @@ from .models import Iteration
 import threading
 import json
 from .controller.parseTree.maxIteration import MaxIteration
+import numpy as np
 
 # Create your views here.
 
@@ -109,8 +110,10 @@ def checkIterationStatus(request):
     return JsonResponse(response)
 
 def fetchOutput(request):
+    iterationObj = MaxIteration()
     bodyUnicode = request.body.decode('utf-8')
     body = json.loads(bodyUnicode)
+    print(body)
     id = body['id']
     iterations = iterationController.getAllIterations(id)
     print("my matrices:")
@@ -120,8 +123,25 @@ def fetchOutput(request):
         matrices[i] = matrices[i].value
     print(matrices)
 
+
+
+    converged = iterationController.getConverged(id)
+    convergeValue = iterationObj.getConvergeValue(id)
+    norms = iterationObj.getNorms(matrices)
+    eigenvalues = iterationObj.getEigenvalues(matrices)
+
+    for i in range(len(eigenvalues)):
+        eigenvalues[i] = list(eigenvalues[i])
+        print(eigenvalues[i])
+        for j in range(len(eigenvalues[i])):
+            eigenvalues[i][j] = float( eigenvalues[i][j])
+        eigenvalues[i] = json.dumps(eigenvalues[i])
+
     response = {
-        'matrices': json.dumps(matrices)
+        'matrices': json.dumps(norms),
+        'converged': converged, 
+        'convergeValue': convergeValue,
+        'eigenvalues': json.dumps(eigenvalues)
     }
 
     return JsonResponse(response)
@@ -146,7 +166,7 @@ def output(request):
     id = request.GET.get('loadingID', '')
 
     print("polynomial:")
-   # allMatrices = iterationController.getAllIterations(id)
+    #allMatrices = iterationController.getAllIterations(id)
     #id = body['id']
     # ids = getOutput()
     context = {

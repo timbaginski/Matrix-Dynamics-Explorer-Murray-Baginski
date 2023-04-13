@@ -6,11 +6,17 @@
 <script src="{% static 'verifyPoly.js' %}"></script> 
 <script src="{% static 'matPopulate.js' %}"></script>
 <script src="{% static 'verifyFile.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% csrf_token %}
 <script>
+
+    let eigenvalues = [];
+    let norms = [];
+
     const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
     async function fetchOutput(id) {
-        console.log("matrices:")
+        //console.log(id);
+        //console.log("matrices:")
         body = {
             'id': id
         }
@@ -26,16 +32,45 @@
 
         let responseJSON = await response.json(); 
         var matrices = responseJSON['matrices']
-        console.log(typeof(matrices))
+
+        let converged = responseJSON['converged'];
+        let convergeValue = responseJSON['convergeValue'];
+        eigenvalues = responseJSON['eigenvalues'];
+        eigenvalues = JSON.parse(eigenvalues);
+
+        for(let i = 0; i < eigenvalues.length; i++) {
+            eigenvalues[i] = JSON.parse(eigenvalues[i]);
+            for(let j = 0; j < eigenvalues[i].length; j++) {
+                eigenvalues[i][j] = eigenvalues[i][j].toFixed(2);
+            }
+        }
+
+        console.log(eigenvalues);
+
+        //console.log(converged);
+
+        const results = document.getElementById('results');
+
+        if(converged) {
+            results.innerHTML = 'The Iteration Ended Up Converging';
+        }
+        else {
+            results.innerHTML = 'The Iteration Ended Up Diverging';
+        }
+
+        //console.log(typeof(matrices))
         //matrices = JSON.parse(matrices)
-        console.log(typeof(matrices[0]))
-        console.log(typeof(matrices))
+        //console.log(typeof(matrices[0]))
+        //console.log(typeof(matrices))
         const numberArray = parseMatrices(matrices)
-        console.log(matrices)
-        console.log(typeof(matrices[0]))
-        console.log(matrices[0])
+        norms = numberArray[0]
+        graphNorm(numberArray[0]);
+
+        //console.log(matrices)
+        //console.log(typeof(matrices[0]))
+        //console.log(matrices[0])
         //const table = document.getElementById('matrix-table');
-        displayMatrices(numberArray)
+        //displayMatrices(numberArray)
     }
 
     function displayMatrices(matrices) {
@@ -44,7 +79,7 @@
         // Clear the table contents
         table.innerHTML = '';
         // Loop through each matrix
-        for (let i = 0; i < matrices.length; i++) {
+        for (let i = 1; i < matrices.length+1; i++) {
           const matrix = matrices[i];
           // Get the matrix dimensions
           const rows = matrix.length;
@@ -87,166 +122,115 @@
         
         return matrices;
       }
+
+      function graphNorm(norms) {
+        console.log(norms.length)
+        const ctx = document.getElementById('myChart'); 
+
+        let labels = [];
+
+        for(let i = 1; i < norms.length+1; i++) {
+            labels.push(i);
+        }
+
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'Norm',
+                data: norms,
+                fill: false,
+                backgroundColor: 'rgb(85, 206, 225)',
+                borderColor: 'rgb(85, 206, 255)',
+                tension: 0.1
+            }]
+        };
+        
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: {
+                            backgroundColor: 'rgb(85, 206, 255)'
+                        }
+                    }
+                }
+            }
+        };
+
+        new Chart(ctx, config);
+      }
+
+      function displayEigenvalues() {
+        const output = document.getElementById('output');
+        const eigenvals = document.createElement('div');
+        eigenvals.setAttribute('id', 'eigenvals');
+
+        output.className = 'list-group';
+
+        for(let i = 0; i < eigenvalues.length; i++) {
+            let temp = document.createElement('li');
+            temp.className = 'list-group-item';
+            
+            let s = "";
+            for(let j = 0; j < eigenvalues[i].length; j++) {
+                s = s + eigenvalues[i][j] + ', ';
+            }
+
+            s = s.substring(0, s.length - 1);
+            temp.innerHTML = s;
+
+            eigenvals.appendChild(temp);
+        }
+
+        removeAllChildNodes(output);
+        output.appendChild(eigenvals);
+      }
+
+      function changeOutput(obj) {
+        let selected = obj.value;
+
+        if(selected == "eigenvalues") {
+            displayEigenvalues();
+        }
+      }
+
+      function removeAllChildNodes(parent) {
+        while (parent.firstChild) {
+            parent.removeChild(parent.firstChild);
+        }   
+      }
+
+      fetchOutput("{{id}}");
     
-
-    function clickNumber() {
-        turnOffMatNames();
-        const matrix = document.getElementById('matrix');
-        matrix.className = 'tab-pane fade'; 
-        const csv = document.getElementById('csv');
-        csv.className = 'tab-pane fade';
-        const form = document.getElementById('polyForm');
-        form.action = "http://localhost:8000/numberPoly";
-        form.method = "GET";
-    }
-    async function clickMatrix() {
-        addMatNames();
-        let id = "{{id}}"; 
-        console.log("My current id:")
-        console.log(id)
-        await fetchOutput(id)
-        const number = document.getElementById('number');
-        number.className = 'tab-pane fade'; 
-        const csv = document.getElementById('csv');
-        csv.className = 'tab-pane fade';
-        const form = document.getElementById('polyForm');
-        form.action = "http://localhost:8000/matrixPoly";
-    }
-    function clickCsv() {
-        turnOffMatNames();
-        const matrix = document.getElementById('matrix');
-        matrix.className = 'tab-pane fade'; 
-        const number = document.getElementById('number');
-        number.className = 'tab-pane fade';
-        const form = document.getElementById('polyForm');
-        form.action = "http://localhost:8000/csvPoly/"; 
-        form.method = "POST";
-    }
-
-    function changeMat(selectObj) {
-        let newDim = selectObj.selectedIndex + 2; 
-        let matForms = document.getElementsByClassName('matForm');
-        let matCols = document.getElementsByClassName('matCol');
-        let matRow = document.getElementById('matRow');
-        let currentDim = Math.sqrt(matForms.length); 
-        let boxesToAdd = newDim - currentDim; 
-        console.log(boxesToAdd);
-
-        if(boxesToAdd == 0) {
-            return; 
-        }
-
-        // If Boxes are removed we need to remove one matCol and one form from each matCol for each removal
-        if(boxesToAdd < 0) {
-            for(let i = 0; i < currentDim - newDim; i++) {
-                matCols[matCols.length - 1].remove();
-                for(let j = 0; j < matCols.length; j++) {
-                    matCols[j].children[matCols[j].children.length-1].remove();
-                }
-            }
-        }
-
-        // Otherwise, we need to add new matCols and matForms
-        else {
-            for(let i = 0; i < boxesToAdd; i++) {
-                newMatCol = matCols[0].cloneNode(true); 
-                matRow.appendChild(newMatCol);
-                matCols = document.getElementsByClassName('matCol');
-
-                for(let j = 0; j < newMatCol.children.length; j++) {
-                    newMatCol.children[j].children[0].setAttribute('name', (matRow.children.length-1).toString() + j.toString());
-                }
-
-                for(let j = 0; j < matCols.length; j++) {
-                    
-                    newMatForm = matCols[0].children[0].cloneNode(true); 
-                    matCols[j].appendChild(newMatForm);
-                    newMatForm.children[0].setAttribute('name', j.toString() + (matCols[j].children.length - 1).toString());
-                    //console.log(newMatForm.children[0].name);
-                }
-            }
-        }
-
-        matInput = document.getElementById('matInput');
-        console.log(matInput);
-    }
-
-    function turnOffMatNames() {
-        matBoxes = document.getElementsByClassName('matBox');
-        for(let i = 0; i < matBoxes.length; i++) {
-            matBoxes[i].removeAttribute('name');
-        }
-    }
-
-    function addMatNames() {
-        matCols = document.getElementsByClassName('matCol');
-        for(let i = 0; i < matCols.length; i++) {
-            for(let j = 0; j < matCols[i].children.length; j++) {
-                matCols[i].children[j].children[0].setAttribute('name', i.toString() + j.toString());
-            }
-        }
-    }
-
 </script>
 {% endblock %}
 
 {% block content %}
-<body>
 <div class="container">
-    
     <div class="row">
         <div class="col-xl-6 col-md-8 col-sm-10 offset-xl-3 offset-md-2 offset-sm-1 text-center">
             <div class="mt-4 mb-1 p-3 bg-light rounded">
-                View output</h1>
+                <h2 id="results"></h2>
             </div>
         </div>
     </div>
+    <div class="row justify-content-center">
+        <div class="col-xl-3">
+          <select class="form-select" onChange="return changeOutput(this);">
+            <option value="norms">Norms</option>
+            <option value="eigenvalues">Eigenvalues</option>
+            <option value="eigenvectors">Eigenvectors</option>
+          </select>
+        </div>
+    </div>
     <div class="row">
-        <div class="col-xl-6 col-md-8 col-sm-10 offset-xl-3 offset-md-2 offset-sm-1">
-            <form method="GET" action="http://localhost:8000/numberPoly" id="polyForm" enctype="multipart/form-data">{% csrf_token %}
-                <ul class="nav nav-tabs", role="tablist">
-                    <li class="nav-item" role="presentation">
-                      <a class="nav-link active" aria-current="page" onclick="return clickNumber();" data-bs-toggle="tab" data-bs-target="#number">Number</a>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                      <a class="nav-link" onclick="return clickMatrix();" data-bs-toggle="tab" data-bs-target="#matrix">All Matricies</a>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                      <a class="nav-link" onclick="return clickCsv();" data-bs-toggle="tab" data-bs-target="#csv">Import File</a>
-                    </li>
-                  </ul>
-                  <div class="form-group d-flex justify-content-center mt-3">
-                    <div class="tab-content" id="myTabContent">
-                        <div class="tab-pane fade" id="csv" role="tabpanel" aria-labelledby="csv-tab">
-                            <input type="file" accept=".csv" name="csv"></input>
-                            <button type="button" class="btn btn-light" onclick="verifyFile();">Verify File</button>
-                        </div>
-                    </div>
-                </div>
-                <small id="usernametext" class="form-text error" style="color: #D30000;"></small>
-                <div class="form-group mt-1">
-                    <div class="tab-content" id="myTabContent">
-                        <div class="tab-pane fade show active" id="number" role="tabpanel" aria-labelledby="number-tab">
-                            <label for="num">Starting Value</label>
-                            <input type="number" class="form-control" id="num" name="num">
-                        </div>
-                    </div>
-                    <div class="tab-content" id="myTabContent">
-                        <div class="tab-pane fade" id="matrix" role="tabpanel" aria-labelledby="matrix-tab">
-                            <div id="matInput">
-                                <table id="matrix-table" style="max-height: 200px; overflow-y: scroll;  overflow-x: auto; width: 100%; table-layout: fixed;";></table>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="d-flex justify-content-center mt-1">
-                    <button type="button" class="btn btn-light" onclick="verifyPoly();">Verify Polynomial</button>
-                    <button type="submit" class="btn btn-light">Submit</button>
-                </div>
-            </form>
+        <div class="col-xl-6 col-md-8 col-sm-12 offset-xl-3 offset-md-2 offset-sm-1 text-center" id="output">
+            <canvas id="myChart">
+            </canvas>
         </div>
     </div>
 </div>
-</body>
 {% endblock %}

@@ -17,3 +17,8 @@
 .matBox {
     text-align: center;
 }
+
+#eigenvals {
+    overflow-y: scroll;
+    position: absolute;
+}
