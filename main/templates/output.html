@@ -285,6 +285,32 @@
         return new Promise(resolve => setTimeout(resolve, ms));
       }
 
+      function saveToFile() {
+        const changeGraph = document.getElementById('changeGraph');
+        let arrayToSave = changeGraph.value == 'eigenvalues' ? eigenvalues : norms; 
+
+        fileString = "";
+        for(let i = 0; i < arrayToSave.length; i++) {
+            if(typeof(arrayToSave[i]) == Object) {
+                fileString += JSON.stringify(arrayToSave[i]) + '\n';
+            }
+            else {
+                fileString += arrayToSave[i].toString() + ',';
+            }
+        }
+
+        fileString = fileString.substring(0, fileString.length-1);
+        console.log(fileString);
+
+        const f = new Blob([fileString], {type: 'text/csv'});
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(f);
+        link.download = changeGraph.value + '.csv';
+        link.click();
+        URL.revokeObjectURL(link.href);
+
+      }
+
       fetchOutput("{{id}}");
     
 </script>
@@ -301,7 +327,7 @@
     </div>
     <div class="row justify-content-center">
         <div class="col-xl-3">
-          <select class="form-select" onChange="return changeOutput(this);">
+          <select class="form-select" onChange="return changeOutput(this);" id="changeGraph">
             <option value="norms">Norms</option>
             <option value="eigenvalues">Eigenvalues</option>
             <option value="eigenvectors">Eigenvectors</option>
@@ -312,6 +338,11 @@
         <div class="col-xl-6 col-md-8 col-sm-12 offset-xl-3 offset-md-2 offset-sm-1 text-center justify-content-center" id="output">
             <canvas id="myChart">
             </canvas>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4 offset-4 text-center justify-content-center">
+            <button type="button" class="btn btn-light" onclick="return saveToFile();">Save</button>
         </div>
     </div>
 </div>
