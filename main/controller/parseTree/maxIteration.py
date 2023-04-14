@@ -148,3 +148,15 @@ class MaxIteration():
             res.append(np.linalg.eigvals(matrices[i]))
 
         return res
+    
+    # Returns whether the divergence approaches infinity or repeats
+    def isInfiniteDivergence(self, norms):
+        visited = set()
+
+        for norm in norms:
+            if norm in visited:
+                return False
+
+            visited.add(norm)
+
+        return True
