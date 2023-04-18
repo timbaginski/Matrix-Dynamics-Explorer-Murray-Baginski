@@ -17,6 +17,8 @@
     }
 
     async function checkIteration() {
+        const loadingID = document.getElementById('loadingID'); 
+        loadingID.value = JSON.stringify(ids);
         const loadingBar = document.getElementById('loadingBar');
         const completed = document.getElementById('completed');
         const status = document.getElementById('status');
@@ -116,6 +118,14 @@
     <div class="row mt-10">
         <div class="col-xl-6 col-md-8 col-sm-10 offset-xl-3 offset-md-2 offset-sm-1">
             <p class="text-center" id="status"></p>
+        </div>
+    </div>
+    <div class="row mt-10">
+        <div class="col-xl-6 col-md-8 col-sm-10 offset-xl-3 offset-md-2 offset-sm-1 justify-content-center text-center">
+            <form action="http://localhost:8000/outputcsv">
+                <button type="submit" class="btn btn-light">View output</button>
+                <input type="hidden" id="loadingID", name="loadingID">
+            </form>
         </div>
     </div>
 </div>

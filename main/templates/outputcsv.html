@@ -1,0 +1,407 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block headers %}
+<title>Matrix Dynamics Explorer</title>
+<script src="{% static 'verifyPoly.js' %}"></script> 
+<script src="{% static 'matPopulate.js' %}"></script>
+<script src="{% static 'verifyFile.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% csrf_token %}
+<script>
+
+    let eigenvalues = [];
+    let norms = [];
+    let chart = null; 
+
+    const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    async function fetchOutput(id) {
+        //console.log(id);
+        //console.log("matrices:")
+        body = {
+            'id': id
+        }
+        let response = await fetch('http://localhost:8000/fetchOutput/', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrf_token
+            },
+            mode: "same-origin",
+            body: JSON.stringify(body)
+        });
+
+        let responseJSON = await response.json(); 
+        var matrices = responseJSON['matrices']
+
+        let converged = responseJSON['converged'];
+        let convergeValue = responseJSON['convergeValue'];
+
+        let infinite = responseJSON['infinite'];
+
+        eigenvalues = responseJSON['eigenvalues'];
+        eigenvalues = JSON.parse(eigenvalues);
+
+        for(let i = 0; i < eigenvalues.length; i++) {
+            eigenvalues[i] = JSON.parse(eigenvalues[i]);
+            for(let j = 0; j < eigenvalues[i].length; j++) {
+                eigenvalues[i][j] = eigenvalues[i][j].toFixed(2);
+            }
+        }
+
+        console.log(eigenvalues);
+
+        //console.log(converged);
+
+        const results = document.getElementById('results');
+
+        if(converged) {
+            results.innerHTML = 'The Iteration Ended Up Converging';
+        }
+        else if(infinite) {
+            results.innerHTML = 'The Iteration Ended Up Diverging in a Cycle';
+        }
+        else {
+            results.innerHTML = 'The Iteration Ended Up Diverging Towards Infinity';
+        }
+
+        updateCsvIndex();
+
+        //console.log(typeof(matrices))
+        //matrices = JSON.parse(matrices)
+        //console.log(typeof(matrices[0]))
+        //console.log(typeof(matrices))
+        const numberArray = parseMatrices(matrices)
+        norms = numberArray[0]
+        graphNorm(numberArray[0]);
+
+        //console.log(matrices)
+        //console.log(typeof(matrices[0]))
+        //console.log(matrices[0])
+        //const table = document.getElementById('matrix-table');
+        //displayMatrices(numberArray)
+    }
+
+    function displayMatrices(matrices) {
+        // Get the matrix table element from the DOM
+        const table = document.getElementById('matrix-table');
+        // Clear the table contents
+        table.innerHTML = '';
+        // Loop through each matrix
+        for (let i = 1; i < matrices.length+1; i++) {
+          const matrix = matrices[i];
+          // Get the matrix dimensions
+          const rows = matrix.length;
+          const cols = matrix[0].length;
+          // Create a new HTML table for the matrix
+          const matrixTable = document.createElement('table');
+          matrixTable.style.tableLayout = 'fixed'; // set table layout to fixed
+          // Loop through each row of the matrix
+          for (let r = 0; r < rows; r++) {
+            // Create a new HTML row for the matrix row
+            const row = document.createElement('tr');
+            for (let c = 0; c < cols; c++) {
+              const cell = document.createElement('td');
+              cell.innerText = matrix[r][c];
+              cell.style.whiteSpace = 'wrap';
+              row.appendChild(cell);
+            }
+            const title = document.createElement('td');
+            title.innerText = 'Iteration ' + r.toString() + ' : ';
+            title.style.whiteSpace = 'nowrap';
+            row.insertBefore(title, row.firstChild); // insert title at the beginning of the row
+            matrixTable.appendChild(row);
+          }
+          matrixTable.style.border = '1px solid black';
+          table.appendChild(matrixTable);
+        }
+      }
+
+      function parseMatrices(input) {
+        // Split input string into individual matrix strings
+        const matrixStrings = input.split(';');
+        
+        // Parse each matrix string and store in an array
+        const matrices = [];
+        for (let i = 0; i < matrixStrings.length; i++) {
+          const matrixString = matrixStrings[i].replace(/\[/g, '[').replace(/\]/g, ']'); // Replace unquoted brackets with quoted brackets
+          const matrix = JSON.parse(matrixString);
+          matrices.push(matrix);
+        }
+        
+        return matrices;
+      }
+
+      function graphNorm(norms) {
+        console.log(norms)
+        const ctx = document.getElementById('myChart'); 
+
+        let labels = [];
+
+        for(let i = 1; i < norms.length+1; i++) {
+            labels.push(i);
+        }
+
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'Norm',
+                data: norms,
+                fill: false,
+                backgroundColor: 'rgb(85, 206, 225)',
+                borderColor: 'rgb(85, 206, 255)',
+                tension: 0.1
+            }]
+        };
+        
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: {
+                            backgroundColor: 'rgb(85, 206, 255)'
+                        }
+                    }
+                }
+            }
+        };
+
+        chart = new Chart(ctx, config);
+      }
+
+      async function displayEigenvalues() {
+        const output = document.getElementById('output');
+        const ctx = document.getElementById('myChart');
+        chart.destroy();
+
+        let mini = Number.MAX_VALUE;
+        let maxi = Number.MIN_VALUE;
+        
+        for(let i = 0; i < eigenvalues.length; i++) {
+            for(let j = 0; j < eigenvalues[i].length; j++) {
+                mini = Math.min(mini, eigenvalues[i][j]);
+                maxi = Math.max(maxi, eigenvalues[i][j]);
+            }
+        }
+
+        for(let i = 0; i < eigenvalues.length; i++) {
+            if(changeGraph.value != 'eigenvalues') {
+                    break; 
+            }
+            data = []
+
+            for(let j = 0; j < eigenvalues[i].length; j++) {
+                data.push({
+                    x: eigenvalues[i][j],
+                    y: 0.1
+                });
+            }
+
+            if(i > 0) {
+                chart.data.datasets.forEach((dataset) => {
+                    while(dataset.data.length > 0) {
+                        dataset.data.pop();
+                    }
+                });
+
+                chart.data.datasets.forEach((dataset) => {
+                    for(let j = 0; j < data.length; j++) {
+                        dataset.data.push(data[j]);
+                    }
+                });
+
+                const changeGraph = document.getElementById('changeGraph');
+
+                chart.update();
+
+                await sleep(500);
+                continue;
+            }
+            
+            chart = new Chart('myChart', {
+                type: "scatter",
+                data: {
+                    datasets: [{
+                        data: data,
+                        backgroundColor: "#0168FF",
+                        borderColor: "#0168FF",
+                        pointBackgroundColor: "white",
+                        pointBorderWidth: 1,      
+                        lineTension: 0,
+                        pointBorderColor: "blue",
+                        pointRadius: 4,
+                        pointHoverRadius: 4,
+                    }],
+                },
+                options: {
+                    plugins: {
+                        datalabels: {
+                            align: 'top',
+                            formatter: function(value, context) {
+                                return context.dataIndex + 1;
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    layout: {
+                        padding: {
+                            right: 0
+                        }
+                    },
+                    legend: {
+                        display: false,
+                        labels: {
+                            fontColor: 'rgba(100,100,100,100)',
+                            fontSize: 20
+                        }
+                    },
+                    tooltips: {
+                        enabled: false
+                    },
+                    scales: {
+                        y: {
+                            display: false,
+                            min: 0,
+                            max: 1
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            min: mini - 5,
+                            max: maxi + 5 
+                        }
+                    }
+                }
+            });
+
+            await sleep(500);
+
+        }
+        
+      }
+
+      function changeOutput(obj) {
+        let selected = obj.value;
+
+        if(selected == "eigenvalues") {
+            displayEigenvalues();
+        }
+
+        if(selected == "norms") {
+            chart.destroy();
+            graphNorm(norms);
+        }
+      }
+
+      function removeAllChildNodes(parent) {
+        while (parent.firstChild) {
+            parent.removeChild(parent.firstChild);
+        }   
+      }
+
+      // Allows us to pause in between checks
+      function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      }
+
+      function saveToFile() {
+        const changeGraph = document.getElementById('changeGraph');
+        let arrayToSave = changeGraph.value == 'eigenvalues' ? eigenvalues : norms; 
+
+        fileString = "";
+        for(let i = 0; i < arrayToSave.length; i++) {
+            if(typeof(arrayToSave[i]) == Object) {
+                fileString += JSON.stringify(arrayToSave[i]) + '\n';
+            }
+            else {
+                fileString += arrayToSave[i].toString() + ',';
+            }
+        }
+
+        fileString = fileString.substring(0, fileString.length-1);
+        console.log(fileString);
+
+        const f = new Blob([fileString], {type: 'text/csv'});
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(f);
+        link.download = changeGraph.value + '.csv';
+        link.click();
+        URL.revokeObjectURL(link.href);
+
+      }
+
+      function updateCsvIndex() {
+        const csvIndex = document.getElementById('csvIndex');
+        csvIndex.innerHTML = "Iteration " + (idIndex + 1).toString() + "/" + ids.length; 
+      }
+
+      function decrementIdIndex() {
+        idIndex = idIndex == 0 ? ids.length - 1 : idIndex - 1; 
+        const changeGraph = document.getElementById('changeGraph');
+        changeGraph.value = "norms";
+        fetchOutput(ids[idIndex]);
+      }
+
+      function incrementIdIndex() {
+        idIndex = idIndex == ids.length - 1 ? 0 : idIndex + 1; 
+        const changeGraph = document.getElementById('changeGraph');
+        changeGraph.value = "norms";
+        fetchOutput(ids[idIndex]);
+      }
+ 
+      let ids = "{{ids}}";
+      ids = JSON.parse(ids);
+      let idIndex = 0;
+      fetchOutput(ids[idIndex]);
+    
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-xl-6 col-md-8 col-sm-10 offset-xl-3 offset-md-2 offset-sm-1 text-center">
+            <div class="mt-4 mb-1 p-3 bg-light rounded">
+                <h2 id="results"></h2>
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-xl-3">
+          <select class="form-select" onChange="return changeOutput(this);" id="changeGraph">
+            <option value="norms">Norms</option>
+            <option value="eigenvalues">Eigenvalues</option>
+            <option value="eigenvectors">Eigenvectors</option>
+          </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xl-6 col-md-8 col-sm-12 offset-xl-3 offset-md-2 offset-sm-1 text-center justify-content-center" id="output">
+            <canvas id="myChart">
+            </canvas>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4 offset-4 text-center justify-content-center">
+            <button type="button" class="btn btn-light" onclick="return saveToFile();">Save</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-2 offset-3 text-center">
+            <button type="button" class="btn btn-light" onclick="return decrementIdIndex()">←</button>
+        </div>
+        <div class="col-2 text-center">
+            <p id="csvIndex"></p>
+        </div>
+        <div class="col-2 text-center">
+            <button type="button" class="btn btn-light" onclick="return incrementIdIndex()">→</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

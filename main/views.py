@@ -113,15 +113,13 @@ def fetchOutput(request):
     iterationObj = MaxIteration()
     bodyUnicode = request.body.decode('utf-8')
     body = json.loads(bodyUnicode)
-    print(body)
     id = body['id']
+    print(id)
     iterations = iterationController.getAllIterations(id)
-    print("my matrices:")
     matrices = list(iterations)
 
     for i in range(len(matrices)):
         matrices[i] = matrices[i].value
-    print(matrices)
 
 
 
@@ -132,7 +130,6 @@ def fetchOutput(request):
 
     for i in range(len(eigenvalues)):
         eigenvalues[i] = list(eigenvalues[i])
-        print(eigenvalues[i])
         for j in range(len(eigenvalues[i])):
             eigenvalues[i][j] = float( eigenvalues[i][j])
         eigenvalues[i] = json.dumps(eigenvalues[i])
@@ -177,6 +174,16 @@ def output(request):
     #print('id:', id)
 
     return render(request, 'output.html', context)
+
+def outputcsv(request):
+    ids = request.GET.get('loadingID', '')
+    
+    context = {
+        'ids': ids
+    }
+
+    return render(request, 'outputcsv.html', context)
+    
 
 
 
