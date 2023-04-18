@@ -58,12 +58,13 @@
     async function startIteration() {
         let outputOptions = ["Final matrix", "All matrices", "Norm vs iterations", "Eigenvalues", "Eigenvectors"];
         let selectedOptions = [];
-        
+        /*
         outputOptions.forEach(option => {
             if(option.checked) {
                 selectedOptions.push(option.value);
             }
         });
+        */
         let body = {id: id, selectedOptions: selectedOptions};
         let response = await fetch("http://localhost:8000/startIteration/", {
             method: "POST",
@@ -106,36 +107,6 @@
     </div>
     <div class="row mt-10">
         <div class="col-xl-6 col-md-8 col-sm-10 offset-xl-3 offset-md-2 offset-sm-1">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="finalMatrixCheck">
-                <label class="form-check-label" for="finalMatrixCheck">
-                    Final Matrix
-                </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="allMatricesCheck">
-                <label class="form-check-label" for="allMatricesCheck">
-                    All Matrices
-                </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="normVsIterationsCheck">
-                <label class="form-check-label" for="normVsIterationsCheck">
-                    Norm vs Iterations
-                </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="eigenvaluesCheck">
-                <label class="form-check-label" for="eigenvaluesCheck">
-                    Eigenvalues
-                </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="eigenvectorsCheck">
-                <label class="form-check-label" for="eigenvectorsCheck">
-                    Eigenvectors
-                </label>
-            </div>
             <form action="http://localhost:8000/output">
                 <button type="submit" class="btn btn-light">View output</button>
                 <input type="hidden" id="loadingID", name="loadingID">
