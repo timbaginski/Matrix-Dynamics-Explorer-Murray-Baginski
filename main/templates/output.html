@@ -241,6 +241,9 @@
                             formatter: function(value, context) {
                                 return context.dataIndex + 1;
                             }
+                        },
+                        legend: {
+                            display: false
                         }
                     },
                     layout: {
@@ -249,7 +252,11 @@
                         }
                     },
                     legend: {
-                        display: false
+                        display: false,
+                        labels: {
+                            fontColor: 'rgba(100,100,100,100)',
+                            fontSize: 20
+                        }
                     },
                     tooltips: {
                         enabled: false
