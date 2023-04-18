@@ -186,6 +186,9 @@
         }
 
         for(let i = 0; i < eigenvalues.length; i++) {
+            if(changeGraph.value != 'eigenvalues') {
+                    break; 
+            }
             data = []
 
             for(let j = 0; j < eigenvalues[i].length; j++) {
@@ -207,6 +210,8 @@
                         dataset.data.push(data[j]);
                     }
                 });
+
+                const changeGraph = document.getElementById('changeGraph');
 
                 chart.update();
 
@@ -277,6 +282,11 @@
 
         if(selected == "eigenvalues") {
             displayEigenvalues();
+        }
+
+        if(selected == "norms") {
+            chart.destroy();
+            graphNorm(norms);
         }
       }
 
