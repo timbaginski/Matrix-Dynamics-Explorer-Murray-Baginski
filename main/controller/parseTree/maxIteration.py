@@ -23,7 +23,6 @@ class MaxIteration():
         elif startValue.replace('.','',1).isdigit():
             startValue = float(startValue)
         else:
-            print(startValue)
             startValue = list(json.loads(startValue))
             startValue = np.asarray(startValue)
             startValue = startValue.astype('float32')
@@ -129,16 +128,17 @@ class MaxIteration():
         self.allIterations(iteration)
 
     # Returns the norm for each iteration step
-    def getNorms(self, matrices):
+    def getNorms(self, matrices): 
         res = []
         for i in range(len(matrices)):
             matrices[i] = json.loads(matrices[i])
             matrices[i] = np.asarray(matrices[i])
 
+            matrices[i] = matrices[i].astype(float)
+
             if i > 0:
                 res.append(abs(np.linalg.norm(matrices[i] - matrices[i-1])))
 
-        print(res)
         return res
     
     # Returns the eigenvalues for each matrix
@@ -154,7 +154,6 @@ class MaxIteration():
         visited = set()
         for matrix in matrices:
             mstr = matrix.tostring()
-            print(mstr)
             if mstr in visited:
                 return False
 
