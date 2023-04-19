@@ -59,6 +59,14 @@ def getMaxIteration(id):
     
     return iteration.maxIteration
 
+def getStartValue(id):
+    iteration = Iteration.objects.get(pk=id)
+
+    if iteration == None:
+        return None
+    
+    return iteration.startValue 
+
 def getAllIterations(id):
     print("trying id")
     print(id)

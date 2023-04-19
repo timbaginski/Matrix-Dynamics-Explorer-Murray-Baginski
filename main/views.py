@@ -122,6 +122,8 @@ def fetchOutput(request):
         matrices[i] = matrices[i].value
 
 
+    startValue = iterationController.getStartValue(id)
+    matrices.insert(0, startValue)
 
     converged = iterationController.getConverged(id)
     convergeValue = iterationObj.getConvergeValue(id)
