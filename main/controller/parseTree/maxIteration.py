@@ -150,13 +150,14 @@ class MaxIteration():
         return res
     
     # Returns whether the divergence approaches infinity or repeats
-    def isInfiniteDivergence(self, norms):
+    def isInfiniteDivergence(self, matrices):
         visited = set()
-
-        for norm in norms:
-            if norm in visited:
+        for matrix in matrices:
+            mstr = matrix.tostring()
+            print(mstr)
+            if mstr in visited:
                 return False
 
-            visited.add(norm)
+            visited.add(mstr)
 
         return True

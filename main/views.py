@@ -141,7 +141,7 @@ def fetchOutput(request):
         'converged': converged, 
         'convergeValue': convergeValue,
         'eigenvalues': json.dumps(eigenvalues),
-        'infinite': iterationObj.isInfiniteDivergence(norms)
+        'infinite': iterationObj.isInfiniteDivergence(matrices)
     }
 
     return JsonResponse(response)

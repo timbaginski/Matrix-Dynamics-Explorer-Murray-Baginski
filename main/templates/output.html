@@ -54,15 +54,16 @@
         //console.log(converged);
 
         const results = document.getElementById('results');
+        console.log(infinite);
 
         if(converged) {
             results.innerHTML = 'The Iteration Ended Up Converging';
         }
         else if(infinite) {
-            results.innerHTML = 'The Iteration Ended Up Diverging in a Cycle';
+            results.innerHTML = 'The Iteration Ended Up Diverging towards Infinity';
         }
         else {
-            results.innerHTML = 'The Iteration Ended Up Diverging Towards Infinity';
+            results.innerHTML = 'The Iteration Ended Up Diverging in a Cycle';
         }
 
         //console.log(typeof(matrices))
