@@ -1,5 +1,6 @@
 from .node import Node 
 import numpy as np 
+from scipy.linalg import fractional_matrix_power
 
 # ExponentNode is a subclass of Node
 class ExponentNode(Node):
@@ -14,6 +15,9 @@ class ExponentNode(Node):
 
         if type(leftVal) != np.ndarray:
             return leftVal ** rightVal
+        
+        if type(rightVal) == float:
+            return fractional_matrix_power(leftVal, rightVal)
 
         return np.linalg.matrix_power(leftVal, rightVal)
     

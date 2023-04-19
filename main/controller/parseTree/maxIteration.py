@@ -32,6 +32,7 @@ class MaxIteration():
         if type(value) == float or type(value) == int:
             first = IterationStep(iterationID=iteration, value=value, step=0)
         else:
+            print(value)
             value = value.tolist()
             first = IterationStep(iterationID=iteration, value=json.dumps(value), step=0)
         

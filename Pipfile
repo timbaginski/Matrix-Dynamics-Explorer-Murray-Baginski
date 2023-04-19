@@ -9,6 +9,7 @@ numpy = "*"
 coverage = "*"
 django-random-id-model = "*"
 pandas = "*"
+scipy = "*"
 
 [dev-packages]
 
