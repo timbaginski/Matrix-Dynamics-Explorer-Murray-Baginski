@@ -341,18 +341,22 @@
         csvIndex.innerHTML = "Iteration " + (idIndex + 1).toString() + "/" + ids.length; 
       }
 
-      function decrementIdIndex() {
+      async function decrementIdIndex() {
         idIndex = idIndex == 0 ? ids.length - 1 : idIndex - 1; 
         const changeGraph = document.getElementById('changeGraph');
         changeGraph.value = "norms";
-        fetchOutput(ids[idIndex]);
+        chart.destroy();
+        await fetchOutput(ids[idIndex]);
+        changeOutput(changeGraph);
       }
 
-      function incrementIdIndex() {
+      async function incrementIdIndex() {
         idIndex = idIndex == ids.length - 1 ? 0 : idIndex + 1; 
         const changeGraph = document.getElementById('changeGraph');
         changeGraph.value = "norms";
-        fetchOutput(ids[idIndex]);
+        chart.destroy();
+        await fetchOutput(ids[idIndex]);
+        changeOutput(changeGraph);
       }
  
       let ids = "{{ids}}";
