@@ -39,7 +39,7 @@ def numberPoly(request):
     id = iterationController.insertIteration(polynomial, str(num), maxIter, threshold)
 
     context = {'id': id}
-    return render(request, 'loading.html', context)
+    return render(request, 'loadingnumber.html', context)
 
 
 def matrixPoly(request):
@@ -185,6 +185,48 @@ def outputcsv(request):
     }
 
     return render(request, 'outputcsv.html', context)
+
+
+def outputnumber(request):
+    id = request.GET.get('loadingID', '')
+    
+    context = {
+        'id': id
+    }
+
+    return render(request, 'outputnumber.html', context)
+
+
+def fetchNumber(request):
+    iterationObj = MaxIteration()
+    bodyUnicode = request.body.decode('utf-8')
+    body = json.loads(bodyUnicode)
+    id = body['id']
+
+    iterations = iterationController.getAllIterations(id)
+
+    values = []
+    for iteration in iterations:
+        values.append(iteration.value)
+
+    startValue = iterationController.getStartValue(id)
+    values.insert(0, startValue)
+    diff = iterationObj.getDifference(values)
+    converged = iterationController.getConverged(id)
+    convergeValue = iterationObj.getConvergeValue(id)
+    infinite = iterationObj.isInfiniteDivergenceNum(values)
+
+    response = {
+        'numbers': json.dumps(diff),
+        'converged': converged,
+        'convergeValue': convergeValue,
+        'infinite': infinite
+    }
+
+    return JsonResponse(response)
+
+
+
     
 
 

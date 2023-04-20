@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block headers %}
+<title>Matrix Dynamics Explorer</title>
+<script src="{% static 'verifyPoly.js' %}"></script> 
+<script src="{% static 'matPopulate.js' %}"></script>
+<script src="{% static 'verifyFile.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% csrf_token %}
+<script>
+    let nums = [];
+    const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    async function fetchOutput(id) {
+        //console.log(id);
+        //console.log("matrices:")
+        body = {
+            'id': id
+        }
+        let response = await fetch('http://localhost:8000/fetchNumber/', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrf_token
+            },
+            mode: "same-origin",
+            body: JSON.stringify(body)
+        });
+
+        let responseJson = await response.json();
+        const results = document.getElementById('results');
+
+        let converged = responseJson['converged'];
+        let infinite = responseJson['infinite'];
+
+        if(converged) {
+            results.innerHTML = 'The Iteration Ended Up Converging';
+        }
+        else if(infinite) {
+            results.innerHTML = 'The Iteration Ended Up Diverging Towards Infinity';
+        }
+        else {
+            results.innerHTML = 'The Iteration Ended Up Diverging in a Cycle';
+        }
+
+        nums = responseJson['numbers'];
+        nums = JSON.parse(nums);
+
+        graphNums(nums);
+    }
+
+
+    function graphNums(nums) {
+        console.log(nums.length)
+        const ctx = document.getElementById('myChart'); 
+
+        let labels = [];
+
+        for(let i = 1; i < nums.length+1; i++) {
+            labels.push(i);
+        }
+
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'Difference',
+                data: nums,
+                fill: false,
+                backgroundColor: 'rgb(85, 206, 225)',
+                borderColor: 'rgb(85, 206, 255)',
+                tension: 0.1
+            }]
+        };
+        
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: {
+                            backgroundColor: 'rgb(85, 206, 255)'
+                        }
+                    }
+                }
+            }
+        };
+
+        chart = new Chart(ctx, config);
+      }
+
+
+    // Allows us to pause in between checks
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function saveToFile() {
+        const changeGraph = document.getElementById('changeGraph');
+        let arrayToSave = nums;
+
+        fileString = "";
+        for(let i = 0; i < arrayToSave.length; i++) {
+            if(typeof(arrayToSave[i]) == Object) {
+                fileString += JSON.stringify(arrayToSave[i]) + '\n';
+            }
+            else {
+                fileString += arrayToSave[i].toString() + ',';
+            }
+        }
+
+        fileString = fileString.substring(0, fileString.length-1);
+        console.log(fileString);
+
+        const f = new Blob([fileString], {type: 'text/csv'});
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(f);
+        link.download = 'numbers.csv';
+        link.click();
+        URL.revokeObjectURL(link.href);
+
+      }
+
+    fetchOutput("{{id}}");
+    
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-xl-6 col-md-8 col-sm-10 offset-xl-3 offset-md-2 offset-sm-1 text-center">
+            <div class="mt-4 mb-1 p-3 bg-light rounded">
+                <h2 id="results"></h2>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xl-6 col-md-8 col-sm-12 offset-xl-3 offset-md-2 offset-sm-1 text-center justify-content-center" id="output">
+            <canvas id="myChart">
+            </canvas>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4 offset-4 text-center justify-content-center">
+            <button type="button" class="btn btn-light" onclick="return saveToFile();">Save</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

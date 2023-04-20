@@ -161,3 +161,22 @@ class MaxIteration():
             visited.add(mstr)
 
         return True
+    
+    # Returns the difference for a number iteration
+    def getDifference(self, numbers):
+        res = []
+        for i in range(1, len(numbers)):
+            res.append(float(numbers[i]) - float(numbers[i-1]))
+        
+        return res
+    
+    # Returns whether the divergence approaches infinity or repeats
+    def isInfiniteDivergenceNum(self, numbers):
+        visited = set()
+        for num in numbers:
+            if num in visited:
+                return False
+
+            visited.add(num)
+
+        return True

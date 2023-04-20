@@ -12,5 +12,7 @@ urlpatterns = [
     path('matrixPoly/', views.matrixPoly),
     path('csvPoly/', views.csvPoly),
     path('output/', views.output),
-    path('outputcsv/', views.outputcsv)
+    path('outputcsv/', views.outputcsv),
+    path('outputnumber/', views.outputnumber),
+    path('fetchNumber/', views.fetchNumber)
 ]
