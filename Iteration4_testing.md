@@ -1,0 +1,42 @@
+We had some trouble getting some cases to work (though the code works well) so our coverage is a bit below goal
+
+Name                                                                        Stmts   Miss  Cover
+-----------------------------------------------------------------------------------------------
+main\__init__.py                                                                0      0   100%
+main\admin.py                                                                   1      0   100%
+main\apps.py                                                                    4      0   100%
+main\controller\iterationController.py                                         54     41    24%
+main\controller\parseTree\__init__.py                                           0      0   100%
+main\controller\parseTree\additionNode.py                                      21      4    81%
+main\controller\parseTree\constantNode.py                                      10      2    80%
+main\controller\parseTree\divisionNode.py                                      14      3    79%
+main\controller\parseTree\exponentNode.py                                      20      6    70%
+main\controller\parseTree\maxIteration.py                                     123     51    59%
+main\controller\parseTree\multiplicationNode.py                                21      4    81%
+main\controller\parseTree\node.py                                              12      2    83%
+main\controller\parseTree\outputCsv.py                                         10      6    40%
+main\controller\parseTree\parseTree.py                                        148     26    82%
+main\controller\parseTree\readMatrices.py                                      43      3    93%
+main\controller\parseTree\subtractionNode.py                                   21      8    62%
+main\controller\parseTree\variableNode.py                                      10      2    80%
+main\migrations\0001_initial.py                                                 5      0   100%
+main\migrations\0002_iteration_converged_iteration_polynomial_and_more.py       4      0   100%
+main\migrations\0003_alter_iteration_id.py                                      4      0   100%
+main\migrations\0004_iteration_convergevalue.py                                 4      0   100%
+main\migrations\0005_iteration_allmatrices.py                                   4      0   100%
+main\migrations\0005_remove_iteration_convergevalue_iterationstep.py            5      0   100%
+main\migrations\0006_alter_iteration_maxiteration.py                            4      0   100%
+main\migrations\0007_alter_iteration_maxiteration_and_more.py                   4      0   100%
+main\migrations\0008_merge_20230323_1841.py                                     4      0   100%
+main\migrations\0009_remove_iteration_allmatrices.py                            4      0   100%
+main\migrations\__init__.py                                                     0      0   100%
+main\models.py                                                                 13      0   100%
+main\tests.py                                                                 243     37    85%
+main\urls.py                                                                    3      0   100%
+main\views.py                                                                 137     58    58%
+manage.py                                                                      12      2    83%
+mde\__init__.py                                                                 0      0   100%
+mde\settings.py                                                                19      0   100%
+mde\urls.py                                                                     3      0   100%
+-----------------------------------------------------------------------------------------------
+TOTAL                                                                         984    255    74%
