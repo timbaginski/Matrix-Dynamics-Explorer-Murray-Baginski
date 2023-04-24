@@ -325,6 +325,30 @@ class ViewsTestCase(TestCase):
                 })
         self.assertEqual(getResponse.status_code, 200)
 
+    def testFetchNumber(self):
+        c = Client()
+        Iteration.objects.create(polynomial='x+1', startValue=3, converged=True)
+        i = Iteration.objects.get(polynomial='x+1')
+        IterationStep.objects.create(iterationID=i, value=5, step=0)
+        IterationStep.objects.create(iterationID=i, value=7, step=1)
+
+        getResponse = c.get('/fetchNumber/', json.dumps({'loadingID': i.id}), content_type='application/json')
+
+        self.assertEqual(getResponse.status_code, 200)
+
+    def testOutputnumber(self):
+        c = Client()
+        Iteration.objects.create(polynomial='x+1', startValue=3, converged=True)
+        i = Iteration.objects.get(polynomial='x+1')
+
+        getResponse = c.get('/outputnumber/', {
+            'id': i.id
+        })
+
+        self.assertEqual(getResponse.status_code, 200)
+
+
+
 
 
 
