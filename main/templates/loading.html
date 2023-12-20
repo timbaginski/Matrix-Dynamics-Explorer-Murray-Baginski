@@ -25,7 +25,7 @@
         let body = {id: id};
 
         while(true) {
-            let response = await fetch('http://localhost:8000/checkIteration/', {
+            let response = await fetch('http://3.23.129.0/checkIteration/', {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -66,7 +66,7 @@
         });
         */
         let body = {id: id, selectedOptions: selectedOptions};
-        let response = await fetch("http://localhost:8000/startIteration/", {
+        let response = await fetch("http://3.23.129.0/startIteration/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -107,7 +107,7 @@
     </div>
     <div class="row mt-10">
         <div class="col-xl-6 col-md-8 col-sm-10 offset-xl-3 offset-md-2 offset-sm-1 justify-content-center text-center">
-            <form action="http://localhost:8000/output">
+            <form action="http://3.23.129.0/output">
                 <button type="submit" class="btn btn-light">View output</button>
                 <input type="hidden" id="loadingID", name="loadingID">
             </form>

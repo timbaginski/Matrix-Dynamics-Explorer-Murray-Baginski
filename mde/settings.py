@@ -23,6 +23,7 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
@@ -31,7 +32,6 @@ dotenv.load_dotenv()
 SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
 ALLOWED_HOSTS = []
@@ -85,11 +85,12 @@ WSGI_APPLICATION = 'mde.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-        'OPTIONS': {
-            'timeout': 5
-        }
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'mde_database',
+        'USER': 'admin',
+        'PASSWORD': os.environ['DB_PASSWORD'],
+        'HOST': 'database-1.chupbvlgyzmj.us-east-2.rds.amazonaws.com',
+        'PORT': '3306'
     }
 }
 
